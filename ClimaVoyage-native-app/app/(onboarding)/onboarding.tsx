@@ -44,8 +44,8 @@ export default function Onboarding() {
         {pages.map((page) => (
           <View key={page.id} style={[styles.page, { width }]}>
             <View style={styles.iconLogo }>
-              <Icons name="shopping-basket" color="black" size={86}/>
-              <Text style={styles.title}>EasyShopper</Text>
+              <Icons name="maps" color="black" size={86}/>
+              <Text style={styles.title}>ClimaVoyage</Text>
             </View>           
             
             <Text style={styles.title}>{page.title}</Text>
