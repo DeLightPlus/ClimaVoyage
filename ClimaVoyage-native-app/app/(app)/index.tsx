@@ -2,37 +2,21 @@ import Icons from '@/utils/Icons';
 
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { GeoError } from 'react-native-geolocation-service';
+import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import getCurrentLocation from '@/utils/getCurrentLocation';
 
-export default function Home() {
+
+const Index = () => {
   const [activeTab, setActiveTab] = useState('activities'); 
 
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [error, setError] = useState<GeoError | null>(null);
-
-  useEffect(() =>{
-    const fetchLocation = async () => {
-      try {
-        const loc = await getCurrentLocation(); // Get the location
-        setLocation(loc); // Update the state with the location
-      } 
-      catch (err) 
-      {
-        setError(err); // Handle any errors (GeoError)
-        console.error('Error fetching location', err);
-      }
-    };
-
-    fetchLocation();
-  }, [])
+  const [locationPermission, setLocationPermission] = useState(false);
+  
 
   return (
     <View style={styles.container}>
       {/* Map View (Placeholder for now) */}
       <View style={styles.mapContainer}>
-        <Text style={styles.mapText}>Map ({`${location}`})</Text>
+        <Text style={styles.mapText}>Map</Text>
       </View>
 
       {/* Search Bar */}
@@ -43,7 +27,7 @@ export default function Home() {
             placeholder="Enter Location"
             placeholderTextColor="#B0B0B0"
           />
-          <Icons name="search" color="black" size={20} style={styles.icon} />
+          <Icons name="search" color="black" size={20} />
 
         </View>
       </View>
@@ -116,6 +100,8 @@ export default function Home() {
   );
 }
 
+export default Index;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -148,8 +134,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     height: 50,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 0,
   },
   icon: {
     marginRight: 100,

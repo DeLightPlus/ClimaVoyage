@@ -8,7 +8,7 @@ import { SessionProvider } from "@/context/AuthContext";
 export default function RootLayout() 
 {
   return (
-    <Provider store={store}>
+    <Provider store={store} children={undefined}>
       <SessionProvider>
         <Stack 
           screenOptions={{
@@ -18,13 +18,14 @@ export default function RootLayout()
             headerShown: false,
           }}
         >
-          <Stack.Screen name="(onboarding)/splash" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(onboarding)/onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/login" />
           <Stack.Screen name="(auth)/register" />
-          <Stack.Screen name="(app)/home" />
-          <Stack.Screen name="(app)/addShoppingItem" />
-          <Stack.Screen name="(app)/shoppinglist" />
+
+          <Stack.Screen name="(app)" />
+          {/* <Stack.Screen name="(app)/(tabs)" /> */}
+          {/* <Stack.Screen name="(app)/" /> */}
         </Stack>  
       </SessionProvider>    
     </Provider>

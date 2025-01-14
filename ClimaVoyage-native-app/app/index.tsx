@@ -4,13 +4,13 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icons from "@/utils/Icons";
 
-export default function Splash() {
+ const Splash = () =>{
   const router = useRouter();
 
   useEffect(() => {   
 
     const checkOnboardingStatus = async () => {
-      await AsyncStorage.removeItem("onboardingComplete");
+      // await AsyncStorage.removeItem("onboardingComplete");
       
       const hasCompletedOnboarding = await AsyncStorage.getItem("onboardingComplete");
       if (hasCompletedOnboarding) 
@@ -36,6 +36,8 @@ export default function Splash() {
     </View>
   );
 }
+
+export default Splash;
 
 const styles = StyleSheet.create({
   container: {

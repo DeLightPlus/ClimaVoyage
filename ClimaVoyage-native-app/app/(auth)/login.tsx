@@ -11,11 +11,11 @@ export default function LoginScreen() {
   const router = useRouter();
 
   const handleGuestLogin = () => {
-    SignIn("Guest", undefined, true).then(() => router.replace("/(app)/home"));
+    SignIn("Guest", undefined, true).then(() => router.push("/(app)"))
   };
 
   const handleLogin = () => {
-    SignIn(email, password).then(() => router.replace("/(app)/home"));
+    SignIn(email, password).then(() => router.push("/(app)"));
   };
 
   return (
