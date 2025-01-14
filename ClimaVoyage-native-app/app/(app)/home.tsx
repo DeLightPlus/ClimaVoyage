@@ -43,7 +43,8 @@ export default function Home() {
             placeholder="Enter Location"
             placeholderTextColor="#B0B0B0"
           />
-          <Icons name="search" color="black" size={20} />
+          <Icons name="search" color="black" size={20} style={styles.icon} />
+
         </View>
       </View>
 
@@ -118,22 +119,27 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#edf2fb',
+    fontFamily: 'Poppins',
   },
   mapContainer: {
     height: 300,
     backgroundColor: '#E5E5E5',
     justifyContent: 'center',
     alignItems: 'center',
+    fontFamily: 'serif',
+    padding: 20,
   },
   mapText: {
     color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   searchContainer: {
     paddingHorizontal: 15,
     marginTop: 20,
+    marginBottom: 20,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -143,14 +149,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 50,
     paddingHorizontal: 15,
+    paddingVertical: 10,
   },
   icon: {
     marginRight: 100,
+
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: '#333',
+    fontFamily: 'OpenSans',
   },
   scrollContainer: {
     flex: 1,
@@ -158,11 +167,14 @@ const styles = StyleSheet.create({
   },
   weatherContainer: {
     marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#F4F4F4',
+    borderRadius: 8,
   },
   weatherTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#020202',
     marginBottom: 10,
   },
   weatherText: {
