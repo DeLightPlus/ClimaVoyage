@@ -10,7 +10,7 @@ export default function Splash() {
   useEffect(() => {   
 
     const checkOnboardingStatus = async () => {
-      // await AsyncStorage.removeItem("onboardingComplete");
+      await AsyncStorage.removeItem("onboardingComplete");
       
       const hasCompletedOnboarding = await AsyncStorage.getItem("onboardingComplete");
       if (hasCompletedOnboarding) 
@@ -29,9 +29,9 @@ export default function Splash() {
   return (
     <View style={styles.container}>
       <View style={styles.iconLogo }>
-        <Icons name="shopping-basket" color="black" size={86}/>
+        <Icons name="logo" color="black" size={86}/>
       </View>
-      <Text style={styles.title}>EasyShopper</Text>
+      <Text style={styles.title}>ClimateVoyage</Text>
       <ActivityIndicator size="large" color="black" />
     </View>
   );
