@@ -2,21 +2,82 @@ import Icons from '@/utils/Icons';
 
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import getCurrentLocation from '@/utils/getCurrentLocation';
+import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+
+import * as Location from 'expo-location';
 
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities'); 
 
-  const [locationPermission, setLocationPermission] = useState(false);
+  const [location, setLocation] = useState<any>(null);
+  const [lat, setLatitude] = useState<number | string>("");
+  const [lon, setLongitude] = useState<number | string>("");
+
+  const getCurrentLocation = async () => {
+    let {status} = await Location.requestForegroundPermissionsAsync();
+
+    if(status !== "granted")
+    {
+      Alert.alert("Permission required to suggest for your current location!!")
+      return;
+    }
+
+    let { coords } = await Location.getCurrentPositionAsync();
+
+    if(coords)
+    {
+      const {latitude, longitude} = coords;
+      console.log("coords: ", latitude, longitude);
+      setLatitude(latitude);
+      setLongitude(longitude);
+
+      let response = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude
+      })
+
+      setLocation(response);
+    }    
+  }
+
+  useEffect(()=>{
+    getCurrentLocation();
+  }, [])
   
 
+  console.log(location, ", lt", lat, " , lo", lon);
+  
   return (
     <View style={styles.container}>
       {/* Map View (Placeholder for now) */}
       <View style={styles.mapContainer}>
-        <Text style={styles.mapText}>Map</Text>
+        {/* <Text style={styles.mapText}>Map({`${lat}`})</Text> */}
+        <View style={styles.mapContainer}>
+        {lat && lon ? (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: Number(lat), // Set latitude
+              longitude: Number(lon), // Set longitude
+              latitudeDelta: 0.0922, // Adjust zoom level
+              longitudeDelta: 0.0421, // Adjust zoom level
+            }}
+          >
+            <Marker coordinate={{ latitude: Number(lat), longitude: Number(lon) }} />
+          </MapView>
+        ) : (
+          <Text style={styles.loadingText}>Loading your location...</Text>
+        )}
+        </View>
+
+        {location && (
+          <View style={styles.locationInfo}>
+            <Text style={styles.locationText}>Location: {location[0]?.city}</Text>
+            <Text style={styles.locationText}>Country: {location[0]?.country}</Text>
+          </View>
+        )}
+
       </View>
 
       {/* Search Bar */}

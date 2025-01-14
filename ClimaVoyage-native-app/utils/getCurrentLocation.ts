@@ -1,5 +1,6 @@
 // utils/getCurrentLocation.ts
-import Geolocation, { GeoError } from 'react-native-geolocation-service';
+import { Platform } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 
 interface Coordinates {
   latitude: number;
@@ -9,22 +10,23 @@ interface Coordinates {
 // Define the getCurrentLocation function returning a Promise
 const getCurrentLocation = (): Promise<Coordinates> => {
   return new Promise((resolve, reject) => {
+    // Uncomment this block if you need permission request on iOS
+    // if (Platform.OS === 'ios') {
+    //   // Request permission for iOS
+    //   Geolocation.requestAuthorization();
+    // }    
     // Get current position
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        console.log('Fetched coordinates:', latitude, longitude);
+        console.log(latitude, " | ", longitude);
         resolve({ latitude, longitude }); // Resolve with coordinates
       },
-      (error: GeoError) => {
-        console.error('Error fetching location:', error);
+      (error) => {
+        console.error('Error fetching location: ', error);
         reject(error); // Reject with error
       },
-      {
-        enableHighAccuracy: true, // Enable high accuracy
-        timeout: 15000,            // Timeout after 15 seconds
-        maximumAge: 10000         // Maximum age for cached location (10 seconds)
-      }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 } // Options for location fetch
     );
   });
 };
