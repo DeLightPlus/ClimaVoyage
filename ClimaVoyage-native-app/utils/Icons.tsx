@@ -56,6 +56,11 @@ type IconProps = {
           return <Icon name="delete" size={30} color="white" />
           break;
 
+       
+          case "search":
+            return <Icon name="search" size={30} color="black" />
+            break;
+
       default:
           return <Icon name="pageline" size={30} color="white" />
           break;
