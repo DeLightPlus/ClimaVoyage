@@ -22,14 +22,14 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.iconLogo }>
-          <Icons name="shopping-basket" color="#BCF2F6" size={86}/>
-          <Text style={styles.logoTitle}>EasyShopper</Text>
+          <Icons name="logo" color="#BCF2F6" size={86}/>
+          <Text style={styles.logoTitle}>ClimaVoyage</Text>
         </View> 
       </View>
 
       <View style={styles.loginForm}>
         <Text style={styles.loginTitleTxt}>
-           Login to <Icons name="shopping-basket" color="black" size={20}/> EasyShopper
+           Login to <Icons name="logo" color="black" size={20}/> ClimaVoyage
         </Text>
 
         <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail}  />
@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     padding:8,
     textAlign:"right",
     alignItems:"center",
-    textDecorationLine:"underline"
 
   },
   input: {

@@ -15,7 +15,8 @@ type IconProps = {
 
   const Icons = ({ name, size = 30, color = 'white' }: IconProps) => {
     
-    switch (name) {
+    switch (name) 
+    {
       case "google":
         return <Icon name="google" size={size} color={color} />
         break;
@@ -28,8 +29,12 @@ type IconProps = {
         return <Icon name="apple" size={size} color={color} />
         break;
 
-      case "shopping-basket":
-        return <Icon name="shopping-basket" size={size} color={color} />
+      case "logo":
+        return <Icon name="map" size={size} color={color} />
+        break;
+
+      case "map-signs":
+        return <Icon name="map-signs" size={size} color={color} />
         break;
 
       case "plus":

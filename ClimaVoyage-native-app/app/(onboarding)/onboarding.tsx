@@ -18,9 +18,21 @@ export default function Onboarding() {
   const [currentPage, setCurrentPage] = useState(0);
 
   const pages = [
-    { id: 1, title: "", description: "Welcome to the Shopping List App!" },
-    { id: 2, title: "Features", description: "Add, edit, and manage your shopping items." },
-    { id: 3, title: "", description: "" },
+    { 
+      id: 1, 
+      title: "Welcome to ClimaVoyage", 
+      description: "Plan your trips based on real-time weather data. Find the best activities for any weather conditions!" 
+    },
+    { 
+      id: 2, 
+      title: "Personalized Travel", 
+      description: "Get weather forecasts and suggestions for activities based on your preferences and destination." 
+    },
+    { 
+      id: 3, 
+      title: "Start Your Journey", 
+      description: "Select your destination and let ClimaVoyage guide you to a perfect trip tailored to the weather!" 
+    }
   ];
 
   const handleScroll = (event) => {
@@ -44,7 +56,7 @@ export default function Onboarding() {
         {pages.map((page) => (
           <View key={page.id} style={[styles.page, { width }]}>
             <View style={styles.iconLogo }>
-              <Icons name="maps" color="black" size={86}/>
+              <Icons name="logo" color="black" size={86}/>
               <Text style={styles.title}>ClimaVoyage</Text>
             </View>           
             
