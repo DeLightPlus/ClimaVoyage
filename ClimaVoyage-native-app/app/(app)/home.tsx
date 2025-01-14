@@ -1,18 +1,38 @@
 import Icons from '@/utils/Icons';
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { StyleSheet } from 'react-native';
+
+import React, { useEffect, useState } from 'react';
+import MapView, { Marker } from 'react-native-maps';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { GeoError } from 'react-native-geolocation-service';
+import getCurrentLocation from '@/utils/getCurrentLocation';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('activities'); // State to manage the active tab
+  const [activeTab, setActiveTab] = useState('activities'); 
+
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [error, setError] = useState<GeoError | null>(null);
+
+  useEffect(() =>{
+    const fetchLocation = async () => {
+      try {
+        const loc = await getCurrentLocation(); // Get the location
+        setLocation(loc); // Update the state with the location
+      } 
+      catch (err) 
+      {
+        setError(err); // Handle any errors (GeoError)
+        console.error('Error fetching location', err);
+      }
+    };
+
+    fetchLocation();
+  }, [])
 
   return (
     <View style={styles.container}>
       {/* Map View (Placeholder for now) */}
       <View style={styles.mapContainer}>
-        <Text style={styles.mapText}>
-           Map Here (Placeholder)
-        </Text>
+        <Text style={styles.mapText}>Map ({`${location}`})</Text>
       </View>
 
       {/* Search Bar */}
@@ -23,8 +43,7 @@ export default function Home() {
             placeholder="Enter Location"
             placeholderTextColor="#B0B0B0"
           />
-          <Icons name="search" color="black" size={20} style={styles.icon} />
-
+          <Icons name="search" color="black" size={20} />
         </View>
       </View>
 
@@ -36,8 +55,12 @@ export default function Home() {
           <Text style={styles.weatherText}>Conditions: Sunny</Text>
         </View>
 
-        {/* Tabs for "Things to Do" */}
-        <View style={styles.tabsContainer}>
+        {/* Tabs for "Things to Do" - Now Scrollable Horizontally */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsContainer} // Ensure that tabs are arranged horizontally
+        >
           <TouchableOpacity
             style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
             onPress={() => setActiveTab('activities')}
@@ -51,7 +74,7 @@ export default function Home() {
             onPress={() => setActiveTab('places')}
           >
             <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>
-              Places to Go
+              Destinations
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -70,7 +93,7 @@ export default function Home() {
               Accommodations
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
 
         {/* Display Content Based on Active Tab */}
         <View style={styles.tabContent}>
@@ -123,7 +146,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 100,
-
   },
   searchInput: {
     flex: 1,
@@ -155,10 +177,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   tab: {
-    flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 20, // Ensure spacing between tabs
   },
   activeTab: {
     borderBottomWidth: 3,
