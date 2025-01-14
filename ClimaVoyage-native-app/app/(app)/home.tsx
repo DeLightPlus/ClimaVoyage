@@ -1,31 +1,34 @@
 import Icons from '@/utils/Icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState('activities'); // State to manage the active tab
+
   return (
     <View style={styles.container}>
       {/* Map View (Placeholder for now) */}
       <View style={styles.mapContainer}>
         <Text style={styles.mapText}>
-          <Icons name="search" color="black" size={20}/> Map Here (Placeholder)
+           Map Here (Placeholder)
         </Text>
       </View>
 
-      {/* Search Bar with Icon */}
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.inputWrapper}>
-          <Icons name="search" color="black" size={20} style={styles.icon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Enter Location"
             placeholderTextColor="#B0B0B0"
           />
+          <Icons name="search" color="black" size={20} style={styles.icon} />
+
         </View>
       </View>
 
-      {/* Weather & Activities Screen */}
+      {/* Weather Info */}
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.weatherContainer}>
           <Text style={styles.weatherTitle}>Weather Info</Text>
@@ -33,24 +36,56 @@ export default function Home() {
           <Text style={styles.weatherText}>Conditions: Sunny</Text>
         </View>
 
-        {/* Activities Cards */}
-        <View style={styles.activitiesContainer}>
-          <Text style={styles.activitiesTitle}>Things to Do</Text>
+        {/* Tabs for "Things to Do" */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
+            onPress={() => setActiveTab('activities')}
+          >
+            <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>
+              Activities
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'places' && styles.activeTab]}
+            onPress={() => setActiveTab('places')}
+          >
+            <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>
+              Places to Go
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'restaurants' && styles.activeTab]}
+            onPress={() => setActiveTab('restaurants')}
+          >
+            <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>
+              Restaurants
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'accommodations' && styles.activeTab]}
+            onPress={() => setActiveTab('accommodations')}
+          >
+            <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>
+              Accommodations
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Activity 1</Text>
-            <Text style={styles.cardDescription}>Explore the park and enjoy nature.</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Activity 2</Text>
-            <Text style={styles.cardDescription}>Visit the museum and learn about history.</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Activity 3</Text>
-            <Text style={styles.cardDescription}>Go for a bike ride around the city.</Text>
-          </View>
+        {/* Display Content Based on Active Tab */}
+        <View style={styles.tabContent}>
+          {activeTab === 'activities' && (
+            <Text style={styles.tabContentText}>Explore activities in this location.</Text>
+          )}
+          {activeTab === 'places' && (
+            <Text style={styles.tabContentText}>Check out places to go and explore.</Text>
+          )}
+          {activeTab === 'restaurants' && (
+            <Text style={styles.tabContentText}>Find the best restaurants around you.</Text>
+          )}
+          {activeTab === 'accommodations' && (
+            <Text style={styles.tabContentText}>Explore available accommodations nearby.</Text>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -87,7 +122,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   icon: {
-    marginRight: 10,
+    marginRight: 100,
+
   },
   searchInput: {
     flex: 1,
@@ -112,34 +148,38 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 5,
   },
-  activitiesContainer: {
-    marginTop: 20,
+  tabsContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  activitiesTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  card: {
-    backgroundColor: '#F4F4F4',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+  activeTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#333',
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  cardDescription: {
-    fontSize: 14,
+  tabText: {
+    fontSize: 16,
     color: '#666',
-    marginTop: 5,
+  },
+  activeTabText: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  tabContent: {
+    padding: 15,
+    backgroundColor: '#F4F4F4',
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  tabContentText: {
+    fontSize: 16,
+    color: '#666',
   },
 });
