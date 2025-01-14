@@ -2,83 +2,121 @@ import Icons from '@/utils/Icons';
 
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
 
-import * as Location from 'expo-location';
+
+import { router } from 'expo-router';
+import useLocation from '@/hooks/useLocation';
+import useWeather from '@/hooks/useWeather';
+import useCurrentLocation from '@/hooks/useCurrentLocation';
+
 
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities'); 
 
-  const [location, setLocation] = useState<any>(null);
-  const [lat, setLatitude] = useState<number | string>("");
-  const [lon, setLongitude] = useState<number | string>("");
+  const [query, setQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const getCurrentLocation = async () => {
-    let {status} = await Location.requestForegroundPermissionsAsync();
+  const { 
+    lat: currentLat, 
+    lon: currentLon, 
+    curLocation,
+    errMsg: currentLocationError, 
+    loading: currentLocationLoading } = useCurrentLocation();
 
-    if(status !== "granted")
-    {
-      Alert.alert("Permission required to suggest for your current location!!")
-      return;
-    }
+  // Use location hook (searching by city name)
+  const { 
+    searchedLat, 
+    searchedLon, 
+    searchedLocation, 
+    errMsg: searchedLocationError, 
+    loading: searchedLocationLoading } = useLocation(searchQuery);
 
-    let { coords } = await Location.getCurrentPositionAsync();
-
-    if(coords)
-    {
-      const {latitude, longitude} = coords;
-      console.log("coords: ", latitude, longitude);
-      setLatitude(latitude);
-      setLongitude(longitude);
-
-      let response = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude
-      })
-
-      setLocation(response);
-    }    
-  }
-
-  useEffect(()=>{
-    getCurrentLocation();
-  }, [])
+  const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
+  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
   
+  const { weatherData, weatherLoading, error } = useWeather(query, useCoordinates);
 
-  console.log(location, ", lt", lat, " , lo", lon);
+  useEffect(() => {
+    if (currentLat && currentLon) 
+    {
+      // Use coordinates to get the weather if available
+      setQuery(`${currentLat},${currentLon}`); // Set query with latitude and longitude
+      setUseCoordinates(true);
+    }
+  }, [currentLat, currentLon]);
+
+  useEffect(() => {
+    // If weather data is fetched, store it in the state
+    if (weatherData) 
+    {
+      setCurLocationWeather(weatherData);
+    }
+  }, [weatherData]);
+
+  const handleSearch = () => {   
+    
+    if (searchQuery.trim()) 
+    {
+      console.log(searchQuery ," _ ");
+      
+      setQuery(searchQuery); // Update the query with the searched city
+      setUseCoordinates(false); // Reset to city-based search
+      
+    } 
+    else 
+    {
+      setQuery(`${currentLat},${currentLon}`); // Fall back to coordinates if no city entered
+      setUseCoordinates(true); // Ensure coordinates are used for weather
+    }
+  };
+
+  // if (errMsg) 
+  // {
+  //   return <Text>{errMsg}</Text>; // Show the error if location is not available
+  // }
+
+  console.log(currentLat, " v ", searchedLat);
+  
   
   return (
     <View style={styles.container}>
-      {/* Map View (Placeholder for now) */}
-      <View style={styles.mapContainer}>
-        {/* <Text style={styles.mapText}>Map({`${lat}`})</Text> */}
-        <View style={styles.mapContainer}>
-        {lat && lon ? (
+      {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: Number(lat), // Set latitude
-              longitude: Number(lon), // Set longitude
-              latitudeDelta: 0.0922, // Adjust zoom level
-              longitudeDelta: 0.0421, // Adjust zoom level
+              latitude: Number(currentLat || searchedLat),
+              longitude: Number(currentLon || searchedLon),
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
             }}
           >
-            <Marker coordinate={{ latitude: Number(lat), longitude: Number(lon) }} />
-          </MapView>
-        ) : (
-          <Text style={styles.loadingText}>Loading your location...</Text>
-        )}
-        </View>
+            {/* Marker for current location */}
+            {currentLat && currentLon && (
+              <Marker coordinate={{ latitude: Number(currentLat), longitude: Number(currentLon) }} title="Current Location" />
+            )}
 
+            {/* Marker for searched location */}
+            {searchedLat && searchedLon && (
+              <Marker coordinate={{ latitude: Number(searchedLat), longitude: Number(searchedLon) }} title="Searched Location" />
+            )}
+          </MapView>         
+          
+        ) : (
+          <Text style={styles.mapText}>Loading your location...</Text>
+        )}
+
+      {/* <View style={styles.mapContainer}>
+       
         {location && (
-          <View style={styles.locationInfo}>
-            <Text style={styles.locationText}>Location: {location[0]?.city}</Text>
-            <Text style={styles.locationText}>Country: {location[0]?.country}</Text>
+          <View >
+            <Text>Location: {location[0]?.city}</Text>
+            <Text>Country: {location[0]?.country}</Text>
           </View>
         )}
 
-      </View>
+      </View> */}
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -87,19 +125,27 @@ const Index = () => {
             style={styles.searchInput}
             placeholder="Enter Location"
             placeholderTextColor="#B0B0B0"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
-          <Icons name="search" color="black" size={20} />
+          <Pressable onPress={handleSearch}>
+            <Icons name="search" color="black" size={20} />
+          </Pressable>
 
         </View>
       </View>
 
       {/* Weather Info */}
       <ScrollView style={styles.scrollContainer}>
-        <View style={styles.weatherContainer}>
-          <Text style={styles.weatherTitle}>Weather Info</Text>
-          <Text style={styles.weatherText}>Current Temperature: 22°C</Text>
-          <Text style={styles.weatherText}>Conditions: Sunny</Text>
-        </View>
+
+        {
+          curLocationWeather && 
+            <View style={styles.weatherContainer}>
+              <Text style={styles.weatherTitle}>Weather Info</Text>
+              <Text style={styles.weatherText}>Current Temperature: {`${curLocationWeather.main.temp}°C`}</Text>
+              <Text style={styles.weatherText}>Conditions: {`${curLocationWeather.weather[0].description}`}</Text>
+            </View>          
+        }       
 
         {/* Tabs for "Things to Do" - Now Scrollable Horizontally */}
         <ScrollView
@@ -170,18 +216,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
   },
   mapContainer: {
-    height: 300,
+    // height: 300,
     backgroundColor: '#E5E5E5',
     justifyContent: 'center',
     alignItems: 'center',
     fontFamily: 'serif',
-    padding: 20,
+    padding: 0,
   },
   mapText: {
     color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  map: {
+    flex: 1,
   },
   searchContainer: {
     paddingHorizontal: 15,
