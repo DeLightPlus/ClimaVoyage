@@ -1,7 +1,7 @@
 
 import React from "react";
 import type { PropsWithChildren } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome6";
 
 // Define IconProps using `type` with optional `size`
 type IconProps = {
@@ -30,12 +30,25 @@ type IconProps = {
         break;
 
       case "logo":
+        return <Icon name="map-location-dot" size={size} color={color} />
+        break;
+
+      case "map":
         return <Icon name="map" size={size} color={color} />
+        break;
+        
+      case "loc-crosshair":
+        return <Icon name="location-crosshairs" size={size} color={color} />
+        break;
+
+      case "loc-dot":
+        return <Icon name="location-dot" size={size} color={color} />
         break;
 
       case "map-signs":
         return <Icon name="map-signs" size={size} color={color} />
         break;
+      
 
       case "plus":
           return <Icon name="plus-square" size={size} color={color} />
@@ -59,12 +72,11 @@ type IconProps = {
       
       case "delete":
           return <Icon name="delete" size={30} color="white" />
-          break;
-
+          break;     
        
-          case "search":
-            return <Icon name="search" size={30} color="black" />
-            break;
+      case "search":
+        return <Icon name="magnifying-glass-location" size={30} color="black" />
+        break;
 
       default:
           return <Icon name="pageline" size={30} color="white" />
