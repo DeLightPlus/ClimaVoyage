@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
-import { router, useRouter } from 'expo-router';
 import Icons from '@/utils/Icons'; 
+import { router, useRouter } from 'expo-router';
+
 
 import MapView, { Marker } from 'react-native-maps';
 
@@ -222,7 +223,7 @@ const Index = () => {
         </View>
       </View>
 
-      <ScrollView horizontal style={{backgroundColor: "wheat", padding:10}}>
+      <ScrollView horizontal style={{backgroundColor: "#F4F4F4", padding:10}}>
         {daily.map((forecast, index) => (
           <TouchableOpacity
             key={index}
@@ -281,7 +282,7 @@ const Index = () => {
 
       <View style={styles.tabContent}>
         {activeTab === 'activities' && (
-          <ScrollView style={{height:250}}>
+          <ScrollView style={styles.activeCardContainer}>
             {activities.map((activity) => (
               <View key={activity.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleActivityClick(activity.id)}>
@@ -293,8 +294,8 @@ const Index = () => {
           </ScrollView>
         )}
 
-        {activeTab === 'places' && (
-          <ScrollView>
+{activeTab === 'places' && (
+          <ScrollView style={styles.activeCardContainer}>
             {places.map((place) => (
               <View key={place.id} style={styles.activityCard}>
                 <Pressable onPress={() => handlePlaceClick(place.id)}>
@@ -307,7 +308,7 @@ const Index = () => {
         )}
 
         {activeTab === 'restaurants' && (
-          <ScrollView>
+        <ScrollView style={styles.activeCardContainer}>
             {restaurants.map((restaurant) => (
               <View key={restaurant.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleRestaurantClick(restaurant.id)}>
@@ -320,7 +321,7 @@ const Index = () => {
         )}
 
         {activeTab === 'accommodations' && (
-          <ScrollView>
+          <ScrollView style={styles.activeCardContainer}>
             {accommodations.map((accommodation) => (
               <View key={accommodation.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleAccommodationClick(accommodation.id)}>
@@ -383,7 +384,7 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenSans',
   },
   card: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#BCF2F6',
     padding: 16,
     marginRight: 12,
     borderRadius: 8,
@@ -433,8 +434,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 2,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    height:32
+    borderBottomColor: 'red',
+    height:32,
+    backgroundColor: '#F4F4F4',
+    width:"100%",
+    height:32,
+    
   },
   tab: {
     padding: 4,
@@ -445,6 +450,7 @@ const styles = StyleSheet.create({
   activeTab: {
     borderBottomWidth: 3,
     borderBottomColor: '#333',
+    backgroundColor: '#edf2fb',
   },
   tabText: {
     fontSize: 16,
@@ -464,8 +470,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
+  activeCardContainer:{
+    height:"100%",
+    backgroundColor: '#F4F4F4',
+  },
   activityCard: {
-    backgroundColor: '#E8F9FF',
+    backgroundColor: 'white',
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
