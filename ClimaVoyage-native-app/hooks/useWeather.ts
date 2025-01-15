@@ -37,7 +37,6 @@ useEffect(() => {
                     units: 'metric', // Temperature in Celsius, use 'imperial' for Fahrenheit
                     },
                 });
-
             } 
             else 
             {
