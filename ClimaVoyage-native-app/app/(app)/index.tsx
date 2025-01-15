@@ -76,13 +76,13 @@ const Index = () => {
     
   }, [weatherData]);
 
-  useEffect(() => {
-    if (weatherData) 
-    {
-      const activities = getSuggestedActivities(weatherData);
-      setSuggestedActivities(activities);
-    }
-  }, [weatherData]);
+  // useEffect(() => {
+  //   if (weatherData) 
+  //   {
+  //     const activities = getSuggestedActivities(weatherData);
+  //     setSuggestedActivities(activities);
+  //   }
+  // }, [weatherData]);
 
 
   const handleSearch = () => {   
@@ -186,11 +186,15 @@ const Index = () => {
       <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>
         <View style={styles.modalContainer}>
           {selectedForecast && (
-            <View>
+            <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{formatDate(selectedForecast.dt_txt)}</Text>
-              <Text style={styles.modalText}>Temperature: {selectedForecast.main.temp}°C</Text>
-              <Text style={styles.modalText}>Weather: {selectedForecast.weather[0].description}</Text>
-              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>              
+              <Text style={styles.modalTemperature}> {selectedForecast.main.temp}°C</Text>
+              <Text style={styles.modaldescription}>Weather: {selectedForecast.weather[0].description}</Text>
+              <Text style={styles.modalhumidity}>Humidity: {selectedForecast.main.humidity}%</Text>
+              <Text style={styles.modalwindSpeed}>Wind Speed: {selectedForecast.wind.speed} m/s  
+                </Text>
+
+              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -359,7 +363,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalTitle: {
     fontSize: 24,
@@ -440,6 +444,52 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  modalContent: {
+    
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+     // changed to transparent background with 50% opacity
+     borderRadius: 8,
+     padding: 20,
+
+  },
+  modalTemperature: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  modalDescription: {
+    fontSize: 16, 
+    marginBottom: 10,
+    },
+  modalButton: {
+    
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,  
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',  
+  },
+  modalhumidity: {
+    fontSize: 16,   
+    marginBottom: 10,
+  },
+  modalwindSpeed: {
+    fontSize: 16,
+    marginBottom: 10, 
+  },
+  modaldescription: {
+    fontSize: 16,
+    marginBottom: 10,   
+  },
+  modalclouds: {
+    fontSize: 16, 
+    marginBottom: 10,
   },
 });
 
