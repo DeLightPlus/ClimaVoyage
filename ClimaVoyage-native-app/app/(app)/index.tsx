@@ -1,17 +1,3 @@
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image } from 'react-native';
-import { router, useRouter } from 'expo-router';
-import Icons from '@/utils/Icons'; // Assuming you have Icons component
-import { accommodations, activities, places, restaurants } from '@/utils/data';
-
-
-=======
-import Icons from '@/utils/Icons';
-
->>>>>>> Stashed changes
 import React, { useEffect, useState } from 'react';
 import { Alert, ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
 import Icons from '@/utils/Icons'; 
@@ -24,94 +10,8 @@ import useLocation from '@/hooks/useLocation';
 import useWeather from '@/hooks/useWeather';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import useForecast from '@/hooks/useForecast';
-
-const activities = [
-  {
-    id: 1,
-    name: 'Activity 1',
-    description: 'Fun outdoor adventure.',
-    image: 'https://example.com/activity1.jpg',
-  },
-  {
-    id: 2,
-    name: 'Activity 2',
-    description: 'Explore the mountains.',
-    image: 'https://example.com/activity2.jpg',
-  },
-  {
-    id: 3,
-    name: 'Activity 3',
-    description: 'Cultural city tour.',
-    image: 'https://example.com/activity3.jpg',
-  },
-];
-
-<<<<<<< Updated upstream
-const accommodations = [
-  {
-    id: 1,
-    name: 'Grand Hotel',
-    description: 'A luxurious hotel in the heart of the city.',
-    image: 'https://example.com/grandhotel.jpg',
-  },
-  {
-    id: 2,
-    name: 'Mountain Resort',
-    description: 'A peaceful retreat surrounded by mountains.',
-    image: 'https://example.com/mountainresort.jpg',
-  },
-  {
-    id: 3,
-    name: 'Beachfront Villa',
-    description: 'A stunning villa located on the beach.',
-    image: 'https://example.com/beachfrontvilla.jpg',
-  },
-];
-
-const restaurants = [
-  {
-    id: 1,
-    name: 'Gourmet Bistro',
-    description: 'A fine dining restaurant offering a unique culinary experience.',
-    image: 'https://example.com/gourmetbistro.jpg',
-  },
-  {
-    id: 2,
-    name: 'Seafood Grill',
-    description: 'Specializing in fresh seafood with a view of the ocean.',
-    image: 'https://example.com/seafoodgrill.jpg',
-  },
-  {
-    id: 3,
-    name: 'Vegan Delight',
-    description: 'A plant-based restaurant with delicious vegan options.',
-    image: 'https://example.com/vegan.jpg',
-  },
-];
-
-const places = [
-  {
-    id: 1,
-    name: 'Eiffel Tower',
-    description: 'Iconic landmark in Paris, France.',
-    image: 'https://example.com/eiffel-tower.jpg',
-  },
-  {
-    id: 2,
-    name: 'Great Wall of China',
-    description: 'Ancient series of walls in China.',
-    image: 'https://example.com/great-wall.jpg',
-  },
-  {
-    id: 3,
-    name: 'Machu Picchu',
-    description: 'Ancient Inca city in the Andes Mountains.',
-    image: 'https://example.com/machu-picchu.jpg',
-  },
-];
-=======
->>>>>>> 72b12d02bff98e517dc3fecac0effa5b6518f2de
->>>>>>> Stashed changes
+import Map from '../component/map';
+import { accommodations, activities, places, restaurants } from '@/utils/data';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities');
@@ -135,10 +35,10 @@ const Index = () => {
     loading: searchedLocationLoading } = useLocation(searchQuery);
 
   const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
-  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
-  
+  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);  
   const { weatherData, weatherLoading } = useWeather(query, useCoordinates);
   const { hourly, daily, forecastsLoading } = useForecast(query, useCoordinates);
+  const [nearbyPlaces, setNearbyPlaces] = useState([]);
 
   const formatDate = (dt_txt) => {
     const date = new Date(dt_txt);
@@ -146,29 +46,56 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (currentLat && currentLon) {
+    if (currentLat && currentLon) 
+    {
       setQuery(`${currentLat},${currentLon}`);
       setUseCoordinates(true);
+      fetchNearbyPlaces(currentLat, currentLon); 
     }
   }, [currentLat, currentLon]);
 
   useEffect(() => {
-    if (weatherData && !searchQuery) {
+    if (searchedLat && searchedLon) {
+      fetchNearbyPlaces(searchedLat, searchedLon); // Fetch places based on searched location
+    }
+  }, [searchedLat, searchedLon]);
+
+  useEffect(() => {
+    if (weatherData && !searchQuery) 
+    {
       setCurLocationWeather(weatherData);
     }
   }, [weatherData]);
 
+
   const handleSearch = () => {   
-    if (searchQuery.trim()) {
+    if (searchQuery.trim()) 
+    {
       setQuery(searchQuery);
       setUseCoordinates(false);
-    } else if(searchedLat && searchedLon) {
+    } 
+    else if(searchedLat && searchedLon) 
+    {
       setQuery(`${searchedLat},${searchedLon}`);
       setUseCoordinates(true);
-    } else {
+    } 
+    else 
+    {
       setQuery(`${currentLat},${currentLon}`);
       setUseCoordinates(true);
     }
+  };
+
+  const fetchNearbyPlaces = async (lat, lon) => {
+    const radius = 1000; // 1 km radius
+    const overpassURL = `https://overpass-api.de/api/interpreter?data=[out:json];(node["amenity"](around:${radius},${lat},${lon}););out;`;
+    try 
+    {
+      const response = await fetch(overpassURL);
+      const data = await response.json();
+      setNearbyPlaces(data.elements); // Set the fetched places into state
+    } 
+    catch (error) { console.error('Error fetching nearby places:', error); }
   };
 
   const [selectedForecast, setSelectedForecast] = useState(null);
@@ -199,33 +126,18 @@ const Index = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.mapContainer}>
-        {(currentLat && currentLon) || (searchedLat && searchedLon) ? (
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: Number(currentLat || searchedLat),
-              longitude: Number(currentLon || searchedLon),
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          >
-            {currentLat && currentLon && curLocation && curLocationWeather && (
-              <Marker coordinate={{ 
-                latitude: Number(currentLat), 
-                longitude: Number(currentLon) }} 
-                title={`${curLocation.city} 🌡${curLocationWeather.main.temp}°C`} />
-            )}
-          </MapView>          
-        ) : (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>            
-            <ActivityIndicator size="large" color="#0000ff" style={{position:"absolute"}}/>
-            <Icons name="loc-dot" color="black" />
-            <Text style={styles.mapText}>Loading your location...</Text>
-          </View>          
-        )}
-      </View>
-
+      <Map 
+        currentLat={currentLat}
+        currentLon={currentLon}
+        searchedLat={searchedLat}
+        searchedLon={searchedLon}
+        curLocation={curLocation}
+        searchedLocation={searchedLocation}
+        curLocationWeather={curLocationWeather}
+        weatherData={weatherData}
+        nearbyPlaces={nearbyPlaces}
+      />
+      
       <View style={styles.searchContainer}>
         <View style={styles.inputWrapper}>
           <TextInput
@@ -241,7 +153,7 @@ const Index = () => {
         </View>
       </View>
 
-      <ScrollView horizontal style={{backgroundColor: "#F4F4F4", padding:10}}>
+      <ScrollView horizontal style={{backgroundColor: "wheat", padding:10}}>
         {daily.map((forecast, index) => (
           <TouchableOpacity
             key={index}
@@ -300,7 +212,7 @@ const Index = () => {
 
       <View style={styles.tabContent}>
         {activeTab === 'activities' && (
-          <ScrollView style={styles.activeCardContainer}>
+          <ScrollView style={{height:250}}>
             {activities.map((activity) => (
               <View key={activity.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleActivityClick(activity.id)}>
@@ -312,13 +224,18 @@ const Index = () => {
           </ScrollView>
         )}
 
-{activeTab === 'places' && (
-          <ScrollView style={styles.activeCardContainer}>
-            {places.map((place) => (
-              <View key={place.id} style={styles.activityCard}>
-                <Pressable onPress={() => handlePlaceClick(place.id)}>
-                  <Text style={styles.tabContentText}>{place.name}</Text>
-                  <Text style={styles.tabContentText}>{place.description}</Text>
+        {activeTab === 'places' && (
+          <ScrollView>
+            {nearbyPlaces.map((place, index) => (
+              <View key={index} style={styles.activityCard}>
+                <Pressable onPress={() => handlePlaceClick(index)}>
+                  <Text style={styles.tabContentText}>
+                    {place.tags.name}
+                  </Text>
+
+                  <Text style={styles.tabContentText}>
+                    {place.tags['amenity'] || place.tags['tourism'] || place.tags['leisure']}
+                  </Text>
                 </Pressable>
               </View>
             ))}
@@ -326,7 +243,7 @@ const Index = () => {
         )}
 
         {activeTab === 'restaurants' && (
-        <ScrollView style={styles.activeCardContainer}>
+          <ScrollView>
             {restaurants.map((restaurant) => (
               <View key={restaurant.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleRestaurantClick(restaurant.id)}>
@@ -339,7 +256,7 @@ const Index = () => {
         )}
 
         {activeTab === 'accommodations' && (
-          <ScrollView style={styles.activeCardContainer}>
+          <ScrollView>
             {accommodations.map((accommodation) => (
               <View key={accommodation.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleAccommodationClick(accommodation.id)}>
@@ -466,6 +383,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   activeTab: {
+    alignSelf:"flex-start",
     borderBottomWidth: 3,
     borderBottomColor: '#333',
     backgroundColor: '#edf2fb',
@@ -507,3 +425,4 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
+

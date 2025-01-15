@@ -8,7 +8,7 @@ import { SessionProvider } from "@/context/AuthContext";
 export default function RootLayout() 
 {
   return (
-    <Provider store={store} children={undefined}>
+    // <Provider store={store} children={undefined}>
       <SessionProvider>
         <Stack 
           screenOptions={{
@@ -32,7 +32,7 @@ export default function RootLayout()
           {/* <Stack.Screen name="(app)/" /> */}
         </Stack>  
       </SessionProvider>    
-    </Provider>
+    // </Provider>
   
   )
 }

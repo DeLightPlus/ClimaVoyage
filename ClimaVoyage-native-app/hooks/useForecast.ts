@@ -6,6 +6,8 @@ const baseUrl = 'http://api.openweathermap.org/data/2.5';
 
 const useForecast = (query, useCoordinates = false) => {
 
+    
+
     const [forecastData , setForecastData] = useState(null)
     const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     
