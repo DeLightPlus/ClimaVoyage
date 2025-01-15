@@ -1,307 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
-import Icons from '@/utils/Icons'; 
-import { router, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { MapView, Marker } from 'expo-maps'; // Use expo-maps instead of react-native-maps
+import Icons from '@/utils/Icons';
 
+const Map = ({
+  currentLat, currentLon,
+  searchedLat, searchedLon,
+  curLocation, searchedLocation,
+  curLocationWeather, weatherData,
+  nearbyPlaces
+}) => {
 
-import MapView, { Marker } from 'react-native-maps';
+  const mapRef = useRef(null);
 
-import useLocation from '@/hooks/useLocation';
-import useWeather from '@/hooks/useWeather';
-import useCurrentLocation from '@/hooks/useCurrentLocation';
-import useForecast from '@/hooks/useForecast';
-import Map from '../component/map';
-import { accommodations, activities, places, restaurants } from '@/utils/data';
-import { getSuggestedActivities } from '@/utils/getSuggestedActivities';
+  const centerLat = searchedLat || currentLat;
+  const centerLon = searchedLon || currentLon;
 
-const Index = () => {
-  const [activeTab, setActiveTab] = useState('activities');
-  const router = useRouter();
-
-  const [query, setQuery] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const { 
-    lat: currentLat, 
-    lon: currentLon, 
-    curLocation,
-    errMsg: currentLocationError, 
-    loading: currentLocationLoading } = useCurrentLocation();
-
-  const { 
-    searchedLat, 
-    searchedLon, 
-    searchedLocation, 
-    errMsg: searchedLocationError, 
-    loading: searchedLocationLoading } = useLocation(searchQuery);
-
-  const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
-  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);  
-  const { weatherData, weatherLoading } = useWeather(query, useCoordinates);
-  const { hourly, daily, forecastsLoading } = useForecast(query, useCoordinates);
-  const [nearbyPlaces, setNearbyPlaces] = useState([]);
-  const [suggestedActivities, setSuggestedActivities] = useState([]);
-
-  const formatDate = (dt_txt) => {
-    const date = new Date(dt_txt);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
-
+  // Use useEffect to animate the map to searched location when the coordinates change
   useEffect(() => {
-    if (currentLat && currentLon) 
-    {
-      setQuery(`${currentLat},${currentLon}`);
-      setUseCoordinates(true);
-      fetchNearbyPlaces(currentLat, currentLon); 
-    }
-  }, [currentLat, currentLon]);
-
-  useEffect(() => {
-    if (searchedLat && searchedLon) {
-      fetchNearbyPlaces(searchedLat, searchedLon); // Fetch places based on searched location
+    if (searchedLat && searchedLon && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: Number(searchedLat),
+          longitude: Number(searchedLon),
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        },
+        1000 // Animate to the searched location with a duration of 1000ms
+      );
     }
   }, [searchedLat, searchedLon]);
 
-  useEffect(() => {
-    if (weatherData && !searchQuery) 
-    {
-      setCurLocationWeather(weatherData);      
-    }  
-
-    if (weatherData) 
-    {
-      const activities = getSuggestedActivities(weatherData);
-      setSuggestedActivities(activities);
-    }
-    
-  }, [weatherData]);
-
-  // useEffect(() => {
-  //   if (weatherData) 
-  //   {
-  //     const activities = getSuggestedActivities(weatherData);
-  //     setSuggestedActivities(activities);
-  //   }
-  // }, [weatherData]);
-
-
-  const handleSearch = () => {   
-    if (searchQuery.trim()) 
-    {
-      setQuery(searchQuery);
-      setUseCoordinates(false);
-    } 
-    else if(searchedLat && searchedLon) 
-    {
-      setQuery(`${searchedLat},${searchedLon}`);
-      setUseCoordinates(true);
-    } 
-    else 
-    {
-      setQuery(`${currentLat},${currentLon}`);
-      setUseCoordinates(true);
-    }
-  };
-
-  const fetchNearbyPlaces = async (lat, lon) => {
-    const radius = 1000; // 1 km radius
-    const overpassURL = `https://overpass-api.de/api/interpreter?data=[out:json];(node["amenity"](around:${radius},${lat},${lon}););out;`;
-    try 
-    {
-      const response = await fetch(overpassURL);
-      const data = await response.json();
-      setNearbyPlaces(data.elements); // Set the fetched places into state
-    } 
-    catch (error) { console.error('Error fetching nearby places:', error); }
-  };
-
-  const [selectedForecast, setSelectedForecast] = useState(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const handleCardPress = (forecast) => {
-    setSelectedForecast(forecast);
-    setModalVisible(true);
-  };
-
-  const handleActivityClick = (id) => {
-    router.push(`/activities/${id}`);
-  };
-
-  const handleAccommodationClick = (id) => {
-    router.push(`/accommodations/${id}`);
-  };
-
-  const handleRestaurantClick = (id) => {
-    router.push(`/restaurants/${id}`);
-  };
-
-  const handlePlaceClick = (id) => {
-    router.push(`/places/${id}`);
-  };
-
-  const closeModal = () => setModalVisible(false);
-
   return (
-    <View style={styles.container}>
-      <Map 
-        currentLat={currentLat}
-        currentLon={currentLon}
-        searchedLat={searchedLat}
-        searchedLon={searchedLon}
-        curLocation={curLocation}
-        searchedLocation={searchedLocation}
-        curLocationWeather={curLocationWeather}
-        weatherData={weatherData}
-        nearbyPlaces={nearbyPlaces}
-      />
-      
-      <View style={styles.searchContainer}>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Enter Location"
-            placeholderTextColor="#B0B0B0"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <Pressable onPress={handleSearch}>
-            <Icons name="search" color="black" size={20} />
-          </Pressable>
-        </View>
-      </View>
-
-      <ScrollView horizontal style={{backgroundColor: "wheat", padding:10}}>
-        {daily.map((forecast, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.card}
-            onPress={() => handleCardPress(forecast)}
-          >
-            <Text style={styles.cardText}>{formatDate(forecast.dt_txt)}</Text>
-            <Text style={styles.cardText}>{forecast.main.temp}°C</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>
-        <View style={styles.modalContainer}>
-          {selectedForecast && (
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{formatDate(selectedForecast.dt_txt)}</Text>
-              <Text style={styles.modalTemperature}> {selectedForecast.main.temp}°C</Text>
-              <Text style={styles.modaldescription}>Weather: {selectedForecast.weather[0].description}</Text>
-              <Text style={styles.modalhumidity}>Humidity: {selectedForecast.main.humidity}%</Text>
-              <Text style={styles.modalwindSpeed}>Wind Speed: {selectedForecast.wind.speed} m/s  
-                </Text>
-
-              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+    <View style={styles.mapContainer}>
+      {(centerLat && centerLon) ? (
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={{
+            latitude: Number(centerLat),
+            longitude: Number(centerLon),
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }} // Use initialRegion for the starting location
+          onRegionChangeComplete={(region) => {
+            // Optionally, track changes in region if needed
+            console.log('Region changed to', region);
+          }}
+        >
+          {/* Display current location marker */}
+          {currentLat && currentLon && curLocation && curLocationWeather && (
+            <Marker
+              coordinate={{
+                latitude: Number(currentLat),
+                longitude: Number(currentLon),
+              }}
+              title={`${curLocation.city} 🌡${curLocationWeather.main.temp}°C`}
+            />
           )}
+
+          {/* Display searched location marker */}
+          {searchedLat && searchedLon && searchedLocation && (
+            <Marker
+              coordinate={{
+                latitude: Number(searchedLat),
+                longitude: Number(searchedLon),
+              }}
+              title={`${searchedLocation.city}`}
+            />
+          )}
+
+          {/* Display nearby places markers */}
+          {nearbyPlaces.map((place, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: place.lat,
+                longitude: place.lon,
+              }}
+              title={place.tags.name || 'Unnamed Place'}
+              description={place.tags['amenity'] || place.tags['tourism'] || place.tags['leisure']}
+            />
+          ))}
+
+        </MapView>
+      ) : (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#0000ff" style={{ position: 'absolute' }} />
+          <Icons name="loc-dot" color="black" />
+          <Text style={styles.mapText}>Loading your location...</Text>
         </View>
-      </Modal>
-
-      <ScrollView 
-        horizontal showsHorizontalScrollIndicator={false} 
-        contentContainerStyle={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
-          onPress={() => setActiveTab('activities')}
-        >
-          <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>Activities</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'places' && styles.activeTab]}
-          onPress={() => setActiveTab('places')}
-        >
-          <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>Destinations</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'restaurants' && styles.activeTab]}
-          onPress={() => setActiveTab('restaurants')}
-        >
-          <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>Restaurants</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'accommodations' && styles.activeTab]}
-          onPress={() => setActiveTab('accommodations')}
-        >
-          <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>Accommodations</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      <View style={styles.tabContent}>
-        {activeTab === 'activities' && (
-          <ScrollView style={styles.activeCardContainer}>
-            {suggestedActivities.map((activity, index) => (
-              <View key={index} style={styles.activityCard}>
-                <Pressable onPress={() => handleActivityClick(index)}>
-                  <Text style={styles.tabContentText}>{activity}</Text>
-                  {/* <Text style={styles.tabContentText}>{activity.description}</Text> */}
-                </Pressable>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-
-        {activeTab === 'places' && (
-          <ScrollView style={styles.activeCardContainer}>
-            {nearbyPlaces.map((place, index) => (
-              <View key={index} style={styles.activityCard}>
-                <Pressable onPress={() => handlePlaceClick(index)}>
-                  <Text style={styles.tabContentText}>
-                    {place.tags.name}
-                  </Text>
-
-                  <Text style={styles.tabContentText}>
-                    {place.tags['amenity'] || place.tags['tourism'] || place.tags['leisure']}
-                  </Text>
-                </Pressable>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-
-        {activeTab === 'restaurants' && (
-          <ScrollView style={styles.activeCardContainer}>
-            {restaurants.map((restaurant) => (
-              <View key={restaurant.id} style={styles.activityCard}>
-                <Pressable onPress={() => handleRestaurantClick(restaurant.id)}>
-                  <Text style={styles.tabContentText}>{restaurant.name}</Text>
-                  <Text style={styles.tabContentText}>{restaurant.description}</Text>
-                </Pressable>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-
-        {activeTab === 'accommodations' && (
-          <ScrollView style={styles.activeCardContainer}>
-            {accommodations.map((accommodation) => (
-              <View key={accommodation.id} style={styles.activityCard}>
-                <Pressable onPress={() => handleAccommodationClick(accommodation.id)}>
-                  <Text style={styles.tabContentText}>{accommodation.name}</Text>
-                  <Text style={styles.tabContentText}>{accommodation.description}</Text>
-                </Pressable>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-      </View>
+      )}
     </View>
   );
-};
+}
 
-export default Index;
+export default Map;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection:"column",
-    backgroundColor: '#edf2fb',
-    fontFamily: 'Poppins',
-  },
   mapContainer: {
     height: 300,
     backgroundColor: '#E5E5E5',
@@ -318,178 +114,4 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  searchContainer: {
-    paddingHorizontal: 15,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#B0B0B0',
-    borderWidth: 1,
-    borderRadius: 8,
-    height: 50,
-    paddingHorizontal: 8,
-    paddingVertical: 0,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'OpenSans',
-  },
-  card: {
-    backgroundColor: '#BCF2F6',
-    padding: 16,
-    marginRight: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 112,
-    height: 64,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  cardText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  modalText: {
-    fontSize: 16,
-    marginTop: 10,
-    color: '#666',
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    marginBottom: 2,
-    borderBottomWidth: 1,
-    borderBottomColor: 'red',
-    height:32,
-    backgroundColor: '#F4F4F4',
-    width:"100%",
-    height:32,
-    
-  },
-  tab: {
-    padding: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 20,
-  },
-  activeTab: {
-    alignSelf:"flex-start",
-    borderBottomWidth: 3,
-    borderBottomColor: '#333',
-    backgroundColor: '#edf2fb',
-  },
-  tabText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  activeTabText: {
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  tabContent: {
-    padding: 15,
-    backgroundColor: '#F4F4F4',
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  tabContentText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  activeCardContainer:{
-    height:"35%",
-    backgroundColor: '#F4F4F4',
-  },
-  activityCard: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalContent: {
-    
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-     // changed to transparent background with 50% opacity
-     borderRadius: 8,
-     padding: 20,
-
-  },
-  modalTemperature: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 10,
-  },
-  modalDescription: {
-    fontSize: 16, 
-    marginBottom: 10,
-    },
-  modalButton: {
-    
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,  
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',  
-  },
-  modalhumidity: {
-    fontSize: 16,   
-    marginBottom: 10,
-  },
-  modalwindSpeed: {
-    fontSize: 16,
-    marginBottom: 10, 
-  },
-  modaldescription: {
-    fontSize: 16,
-    marginBottom: 10,   
-  },
-  modalclouds: {
-    fontSize: 16, 
-    marginBottom: 10,
-  },
 });
-
