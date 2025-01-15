@@ -1,18 +1,122 @@
-import Icons from '@/utils/Icons';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image } from 'react-native';
+import { router, useRouter } from 'expo-router';
+import Icons from '@/utils/Icons'; // Assuming you have Icons component
 
-import React, { useEffect, useState } from 'react';
-import MapView, { Marker } from 'react-native-maps';
-import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import getCurrentLocation from '@/utils/getCurrentLocation';
+const activities = [
+  {
+    id: 1,
+    name: 'Activity 1',
+    description: 'Fun outdoor adventure.',
+    image: 'https://example.com/activity1.jpg',
+  },
+  {
+    id: 2,
+    name: 'Activity 2',
+    description: 'Explore the mountains.',
+    image: 'https://example.com/activity2.jpg',
+  },
+  {
+    id: 3,
+    name: 'Activity 3',
+    description: 'Cultural city tour.',
+    image: 'https://example.com/activity3.jpg',
+  },
+];
+
+const accommodations = [
+  {
+    id: 1,
+    name: 'Grand Hotel',
+    description: 'A luxurious hotel in the heart of the city.',
+    image: 'https://example.com/grandhotel.jpg',
+  },
+  {
+    id: 2,
+    name: 'Mountain Resort',
+    description: 'A peaceful retreat surrounded by mountains.',
+    image: 'https://example.com/mountainresort.jpg',
+  },
+  {
+    id: 3,
+    name: 'Beachfront Villa',
+    description: 'A stunning villa located on the beach.',
+    image: 'https://example.com/beachfrontvilla.jpg',
+  },
+
+]
+
+const restaurants = [{
+  id: 1,
+  name: 'Gourmet Bistro',
+  description: 'A fine dining restaurant offering a unique culinary experience.',
+  image: 'https://example.com/gourmetbistro.jpg',
+},
+{
+  id: 2,
+  name: 'Seafood Grill',
+  description: 'Specializing in fresh seafood with a view of the ocean.',
+  image: 'https://example.com/seafoodgrill.jpg',
+},
+{
+  id: 3,
+  name: 'Vegan Delight',
+  description: 'A plant-based restaurant with delicious vegan options.',
+  image: 'https://example.com/vegan.jpg',
+},
+
+]
+const places = [
+  {
+    id: 1,
+    name: 'Eiffel Tower',
+    description: 'Iconic landmark in Paris, France.',
+    image: 'https://example.com/eiffel-tower.jpg',
+  },
+  {
+    id: 2,
+    name: 'Great Wall of China',
+    description: 'Ancient series of walls in China.',
+    image: 'https://example.com/great-wall.jpg',
+  },
+  {
+    id: 3,
+    name: 'Machu Picchu',
+    description: 'Ancient Inca city in the Andes Mountains.',
+    image: 'https://example.com/machu-picchu.jpg',
+  },
+];
+
+
+
+
 
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('activities'); 
+  const [activeTab, setActiveTab] = useState('activities'); // Default tab is 'activities'
+  const router = useRouter(); // Initialize router
 
-  const [locationPermission, setLocationPermission] = useState(false);
-  
+  const handleActivityClick = (id) => {
+    router.push(`/activities/${id}`); // Navigate to the dynamic route with the activity id
+  };
 
-  return (
+  const handleAccommodationClick = (id) => {
+    router.push(`/accommodations/${id}`); // Navigate to the dynamic route with the accommodation
+    // id
+  };
+  const handleRestaurantClick = (id) => {
+    router.push(`/restaurants/${id}`); // Navigate to the dynamic route with the restaurant id
+  };
+
+  const handlePlaceClick = (id) => {
+    // Navigate to the dynamic route with the place id
+    router.push(`/places/${id}`);
+  };
+
+
+
+
+return (
     <View style={styles.container}>
       {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
           <MapView
@@ -61,13 +165,13 @@ const Index = () => {
             onChangeText={setSearchQuery}
           />
           <Icons name="search" color="black" size={20} />
-
         </View>
       </View>
 
       {/* Weather Info */}
       <ScrollView style={styles.scrollContainer}>
 
+<<<<<<< Updated upstream
         {
           curLocationWeather && 
             <View style={styles.weatherContainer}>
@@ -77,6 +181,8 @@ const Index = () => {
             </View>          
         }       
 
+=======
+>>>>>>> Stashed changes
         {/* Tabs for "Things to Do" */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
           <TouchableOpacity
