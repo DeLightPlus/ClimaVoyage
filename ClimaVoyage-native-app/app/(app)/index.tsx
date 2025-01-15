@@ -2,14 +2,13 @@ import Icons from '@/utils/Icons';
 
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
-
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Pressable, ActivityIndicator } from 'react-native';
 
 import { router } from 'expo-router';
 import useLocation from '@/hooks/useLocation';
 import useWeather from '@/hooks/useWeather';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
-
+import useForecast from '@/hooks/useForecast';
 
 
 const Index = () => {
@@ -36,7 +35,13 @@ const Index = () => {
   const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
   const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
   
-  const { weatherData, weatherLoading, error } = useWeather(query, useCoordinates);
+  const { weatherData, weatherLoading } = useWeather(query, useCoordinates);
+  const { hourly, daily, forecastsLoading } = useForecast(query, useCoordinates);
+
+  const formatDate = (dt_txt) => {
+    const date = new Date(dt_txt); // Convert to Date object
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
 
   useEffect(() => {
     if (currentLat && currentLon) 
@@ -49,7 +54,7 @@ const Index = () => {
 
   useEffect(() => {
     // If weather data is fetched, store it in the state
-    if (weatherData) 
+    if (weatherData && !searchQuery) 
     {
       setCurLocationWeather(weatherData);
     }
@@ -59,17 +64,29 @@ const Index = () => {
     
     if (searchQuery.trim()) 
     {
-      console.log(searchQuery ," _ ");
-      
+      console.log(searchQuery ," _ ");      
       setQuery(searchQuery); // Update the query with the searched city
-      setUseCoordinates(false); // Reset to city-based search
-      
+      setUseCoordinates(false); // Reset to city-based search      
     } 
-    else 
+    else if(searchedLat && searchedLon)
     {
-      setQuery(`${currentLat},${currentLon}`); // Fall back to coordinates if no city entered
+      setQuery(`${searchedLat},${searchedLon}`); // Fall back to coordinates if no city entered
       setUseCoordinates(true); // Ensure coordinates are used for weather
     }
+    else
+    {
+      {
+        setQuery(`${currentLat},${currentLon}`); // Fall back to coordinates if no city entered
+        setUseCoordinates(true); // Ensure coordinates are used for weather
+      }
+    }
+  };
+
+  const [selectedForecast, setSelectedForecast] = useState(null);
+
+  const handleCardPress = (forecast) => {
+    // Set the selected forecast for detailed weather info
+    setSelectedForecast(forecast);
   };
 
   // if (errMsg) 
@@ -82,7 +99,8 @@ const Index = () => {
   
   return (
     <View style={styles.container}>
-      {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
+        {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
+          
           <MapView
             style={styles.map}
             initialRegion={{
@@ -92,19 +110,29 @@ const Index = () => {
               longitudeDelta: 0.0421,
             }}
           >
-            {/* Marker for current location */}
-            {currentLat && currentLon && (
-              <Marker coordinate={{ latitude: Number(currentLat), longitude: Number(currentLon) }} title="Current Location" />
-            )}
 
             {/* Marker for searched location */}
             {searchedLat && searchedLon && (
               <Marker coordinate={{ latitude: Number(searchedLat), longitude: Number(searchedLon) }} title="Searched Location" />
             )}
+
+            {/* Marker for current location */}
+            {currentLat && currentLon && curLocation && curLocationWeather && (
+              <Marker coordinate={{ 
+                latitude: Number(currentLat), 
+                longitude: Number(currentLon) }} 
+                title={`${curLocation.city} 🌡${curLocationWeather.main.temp}°C`} />
+            )}
+
           </MapView>         
           
         ) : (
-          <Text style={styles.mapText}>Loading your location...</Text>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>            
+            <ActivityIndicator size="large" color="#0000ff" style={{position:"absolute"}}/>
+            <Icons name="loc-dot" color="black" />
+            <Text style={styles.mapText}>Loading your location...</Text>
+          </View>
+          
         )}
 
       {/* <View style={styles.mapContainer}>
@@ -135,6 +163,22 @@ const Index = () => {
         </View>
       </View>
 
+      <ScrollView 
+        horizontal
+        style={{backgroundColor: "wheat", padding:10}}        
+      >
+        {daily.map((forecast, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => handleCardPress(forecast)}
+          >
+            <Text style={styles.cardText}>{formatDate(forecast.dt_txt)}</Text>
+            <Text style={styles.cardText}>{forecast.main.temp}°C</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       {/* Weather Info */}
       <ScrollView style={styles.scrollContainer}>
 
@@ -142,8 +186,8 @@ const Index = () => {
           curLocationWeather && 
             <View style={styles.weatherContainer}>
               <Text style={styles.weatherTitle}>Weather Info</Text>
-              <Text style={styles.weatherText}>Current Temperature: {`${curLocationWeather.main.temp}°C`}</Text>
-              <Text style={styles.weatherText}>Conditions: {`${curLocationWeather.weather[0].description}`}</Text>
+              <Text style={styles.weatherText}>🌡: {`${curLocationWeather.main.temp}°C`}</Text>
+              <Text style={styles.weatherText}>{`${curLocationWeather.weather[0].description}`}</Text>
             </View>          
         }       
 
@@ -227,7 +271,8 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginVertical: 2,
+    marginTop: 8
   },
   map: {
     flex: 1,
@@ -251,6 +296,8 @@ const styles = StyleSheet.create({
     marginRight: 100,
 
   },
+
+
   searchInput: {
     flex: 1,
     fontSize: 16,
@@ -261,6 +308,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
   },
+
+  card: {
+    backgroundColor: 'lightblue',
+    padding: 16,
+    marginRight: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 112,
+    height: 64
+  },
+  cardText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  
   weatherContainer: {
     marginBottom: 20,
     padding: 20,

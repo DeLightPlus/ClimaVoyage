@@ -39,3 +39,7 @@ export default function Map() {
 
 
 
+const formatDate = (dt_txt) => {
+  const date = new Date(dt_txt); // Convert to Date object
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+};
