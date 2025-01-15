@@ -43,29 +43,29 @@ const accommodations = [
     description: 'A stunning villa located on the beach.',
     image: 'https://example.com/beachfrontvilla.jpg',
   },
+];
 
-]
+const restaurants = [
+  {
+    id: 1,
+    name: 'Gourmet Bistro',
+    description: 'A fine dining restaurant offering a unique culinary experience.',
+    image: 'https://example.com/gourmetbistro.jpg',
+  },
+  {
+    id: 2,
+    name: 'Seafood Grill',
+    description: 'Specializing in fresh seafood with a view of the ocean.',
+    image: 'https://example.com/seafoodgrill.jpg',
+  },
+  {
+    id: 3,
+    name: 'Vegan Delight',
+    description: 'A plant-based restaurant with delicious vegan options.',
+    image: 'https://example.com/vegan.jpg',
+  },
+];
 
-const restaurants = [{
-  id: 1,
-  name: 'Gourmet Bistro',
-  description: 'A fine dining restaurant offering a unique culinary experience.',
-  image: 'https://example.com/gourmetbistro.jpg',
-},
-{
-  id: 2,
-  name: 'Seafood Grill',
-  description: 'Specializing in fresh seafood with a view of the ocean.',
-  image: 'https://example.com/seafoodgrill.jpg',
-},
-{
-  id: 3,
-  name: 'Vegan Delight',
-  description: 'A plant-based restaurant with delicious vegan options.',
-  image: 'https://example.com/vegan.jpg',
-},
-
-]
 const places = [
   {
     id: 1,
@@ -87,11 +87,6 @@ const places = [
   },
 ];
 
-
-
-
-
-
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities'); // Default tab is 'activities'
   const router = useRouter(); // Initialize router
@@ -101,9 +96,9 @@ const Index = () => {
   };
 
   const handleAccommodationClick = (id) => {
-    router.push(`/accommodations/${id}`); // Navigate to the dynamic route with the accommodation
-    // id
+    router.push(`/accommodations/${id}`); // Navigate to the dynamic route with the accommodation id
   };
+
   const handleRestaurantClick = (id) => {
     router.push(`/restaurants/${id}`); // Navigate to the dynamic route with the restaurant id
   };
@@ -113,169 +108,93 @@ const Index = () => {
     router.push(`/places/${id}`);
   };
 
-
-
-
-return (
+  return (
     <View style={styles.container}>
-      {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: Number(currentLat || searchedLat),
-              longitude: Number(currentLon || searchedLon),
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          >
-            {/* Marker for current location */}
-            {currentLat && currentLon && (
-              <Marker coordinate={{ latitude: Number(currentLat), longitude: Number(currentLon) }} title="Current Location" />
-            )}
-
-            {/* Marker for searched location */}
-            {searchedLat && searchedLon && (
-              <Marker coordinate={{ latitude: Number(searchedLat), longitude: Number(searchedLon) }} title="Searched Location" />
-            )}
-          </MapView>         
-          
-        ) : (
-          <Text style={styles.mapText}>Loading your location...</Text>
-        )}
-
-      {/* <View style={styles.mapContainer}>
-       
-        {location && (
-          <View >
-            <Text>Location: {location[0]?.city}</Text>
-            <Text>Country: {location[0]?.country}</Text>
-          </View>
-        )}
-
-      </View> */}
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Enter Location"
-            placeholderTextColor="#B0B0B0"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <Icons name="search" color="black" size={20} />
-        </View>
-      </View>
-
-      {/* Weather Info */}
-      <ScrollView style={styles.scrollContainer}>
-
-<<<<<<< Updated upstream
-        {
-          curLocationWeather && 
-            <View style={styles.weatherContainer}>
-              <Text style={styles.weatherTitle}>Weather Info</Text>
-              <Text style={styles.weatherText}>Current Temperature: {`${curLocationWeather.main.temp}°C`}</Text>
-              <Text style={styles.weatherText}>Conditions: {`${curLocationWeather.weather[0].description}`}</Text>
-            </View>          
-        }       
-
-=======
->>>>>>> Stashed changes
-        {/* Tabs for "Things to Do" */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
-            onPress={() => setActiveTab('activities')}
-          >
-            <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>Activities</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'places' && styles.activeTab]}
-            onPress={() => setActiveTab('places')}
-          >
-            <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>Destinations</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'restaurants' && styles.activeTab]}
-            onPress={() => setActiveTab('restaurants')}
-          >
-            <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>Restaurants</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'accommodations' && styles.activeTab]}
-            onPress={() => setActiveTab('accommodations')}
-          >
-            <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>Accommodations</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        {/* Display Content Based on Active Tab */}
-        <View style={styles.tabContent}>
-          {activeTab === 'activities' && (
-            <ScrollView>
-              {activities.map((activity) => (
-
-                <View key={activity.id} style={styles.activityCard}>
-                  {/* <Text style={styles.name}>{activity.name}</Text>
-                        <Text style={styles.description}>{activity.description}</Text> */}
-                  <Pressable onPress={() => handleActivityClick(activity.id)}>
-                    <Text style={styles.tabContentText}>Destination 1</Text>
-                  </Pressable>
-                </View>
-
-              ))}
-            </ScrollView>
-          )}
-
-          {activeTab === 'places' && (
-              <ScrollView>
-              {places.map((place) => (
-                <View style={styles.activityCard}>
-              <Pressable onPress={() => handlePlaceClick(place.id)}>
-                    <Text style={styles.tabContentText}>{`${place.name}`} </Text>
-                  </Pressable>
-                </View>
-              ))}             
-              </ScrollView>
-            )}
-
-          {activeTab === 'restaurants' && (
-            <ScrollView>
-
-              {restaurants.map((activity) => (
-                <View style={styles.activityCard}>
-                  <Pressable onPress={() => handleRestaurantClick(accommodations.id)}>
-                    <Text style={styles.tabContentText}>Restaurant 1</Text>
-                  </Pressable>
-                </View>
-              ))}
-
-
-            </ScrollView>
-          )}
-
-          {activeTab === 'accommodations' && (
-            <ScrollView>
-              {accommodations.map((activity) => (
-                <View style={styles.activityCard}>
-                  <Pressable onPress={() => handleAccommodationClick(accommodations.id)}>
-                    <Text style={styles.tabContentText}>Accommodation 1</Text>
-                  </Pressable>
-                </View>
-
-                ))}
-        
-              
-              </ScrollView>
-          )}
-          
-        </View>
+      {/* Tabs for "Things to Do" */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
+          onPress={() => setActiveTab('activities')}
+        >
+          <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>Activities</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'places' && styles.activeTab]}
+          onPress={() => setActiveTab('places')}
+        >
+          <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>Destinations</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'restaurants' && styles.activeTab]}
+          onPress={() => setActiveTab('restaurants')}
+        >
+          <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>Restaurants</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'accommodations' && styles.activeTab]}
+          onPress={() => setActiveTab('accommodations')}
+        >
+          <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>Accommodations</Text>
+        </TouchableOpacity>
       </ScrollView>
+
+      {/* Display Content Based on Active Tab */}
+      <View style={styles.tabContent}>
+        {activeTab === 'activities' && (
+          <ScrollView>
+            {activities.map((activity) => (
+              <View key={activity.id} style={styles.activityCard}>
+                <Pressable onPress={() => handleActivityClick(activity.id)}>
+                  <Text style={styles.tabContentText}>{activity.name}</Text>
+                  <Text style={styles.tabContentText}>{activity.description}</Text>
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
+        {activeTab === 'places' && (
+          <ScrollView>
+            {places.map((place) => (
+              <View key={place.id} style={styles.activityCard}>
+                <Pressable onPress={() => handlePlaceClick(place.id)}>
+                  <Text style={styles.tabContentText}>{place.name}</Text>
+                  <Text style={styles.tabContentText}>{place.description}</Text>
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
+        {activeTab === 'restaurants' && (
+          <ScrollView>
+            {restaurants.map((restaurant) => (
+              <View key={restaurant.id} style={styles.activityCard}>
+                <Pressable onPress={() => handleRestaurantClick(restaurant.id)}>
+                  <Text style={styles.tabContentText}>{restaurant.name}</Text>
+                  <Text style={styles.tabContentText}>{restaurant.description}</Text>
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
+        {activeTab === 'accommodations' && (
+          <ScrollView>
+            {accommodations.map((accommodation) => (
+              <View key={accommodation.id} style={styles.activityCard}>
+                <Pressable onPress={() => handleAccommodationClick(accommodation.id)}>
+                  <Text style={styles.tabContentText}>{accommodation.name}</Text>
+                  <Text style={styles.tabContentText}>{accommodation.description}</Text>
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+      </View>
     </View>
   );
-}
+};
 
 export default Index;
 
@@ -284,65 +203,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#edf2fb',
     fontFamily: 'Poppins',
-  },
-  mapContainer: {
-    // height: 300,
-    backgroundColor: '#E5E5E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontFamily: 'serif',
-    padding: 0,
-  },
-  mapText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  map: {
-    flex: 1,
-  },
-  searchContainer: {
-    paddingHorizontal: 15,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#B0B0B0',
-    borderWidth: 1,
-    borderRadius: 8,
-    height: 50,
-    paddingHorizontal: 8,
-    paddingVertical: 0,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'OpenSans',
-  },
-  scrollContainer: {
-    flex: 1,
-    padding: 15,
-  },
-  weatherContainer: {
-    marginBottom: 20,
-    padding: 20,
-    backgroundColor: '#F4F4F4',
-    borderRadius: 8,
-  },
-  weatherTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#020202',
-    marginBottom: 10,
-  },
-  weatherText: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -392,4 +252,4 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-})
+});
