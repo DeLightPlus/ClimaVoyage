@@ -2,84 +2,16 @@ import Icons from '@/utils/Icons';
 
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
-
-
-import { router } from 'expo-router';
-import useLocation from '@/hooks/useLocation';
-import useWeather from '@/hooks/useWeather';
-import useCurrentLocation from '@/hooks/useCurrentLocation';
-
+import { PermissionsAndroid, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import getCurrentLocation from '@/utils/getCurrentLocation';
 
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities'); 
 
-  const [query, setQuery] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const { 
-    lat: currentLat, 
-    lon: currentLon, 
-    curLocation,
-    errMsg: currentLocationError, 
-    loading: currentLocationLoading } = useCurrentLocation();
-
-  // Use location hook (searching by city name)
-  const { 
-    searchedLat, 
-    searchedLon, 
-    searchedLocation, 
-    errMsg: searchedLocationError, 
-    loading: searchedLocationLoading } = useLocation(searchQuery);
-
-  const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
-  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
+  const [locationPermission, setLocationPermission] = useState(false);
   
-  const { weatherData, weatherLoading, error } = useWeather(query, useCoordinates);
 
-  useEffect(() => {
-    if (currentLat && currentLon) 
-    {
-      // Use coordinates to get the weather if available
-      setQuery(`${currentLat},${currentLon}`); // Set query with latitude and longitude
-      setUseCoordinates(true);
-    }
-  }, [currentLat, currentLon]);
-
-  useEffect(() => {
-    // If weather data is fetched, store it in the state
-    if (weatherData) 
-    {
-      setCurLocationWeather(weatherData);
-    }
-  }, [weatherData]);
-
-  const handleSearch = () => {   
-    
-    if (searchQuery.trim()) 
-    {
-      console.log(searchQuery ," _ ");
-      
-      setQuery(searchQuery); // Update the query with the searched city
-      setUseCoordinates(false); // Reset to city-based search
-      
-    } 
-    else 
-    {
-      setQuery(`${currentLat},${currentLon}`); // Fall back to coordinates if no city entered
-      setUseCoordinates(true); // Ensure coordinates are used for weather
-    }
-  };
-
-  // if (errMsg) 
-  // {
-  //   return <Text>{errMsg}</Text>; // Show the error if location is not available
-  // }
-
-  console.log(currentLat, " v ", searchedLat);
-  
-  
   return (
     <View style={styles.container}>
       {(currentLat && currentLon) || (searchedLat && searchedLon) ? (      
@@ -128,9 +60,7 @@ const Index = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <Pressable onPress={handleSearch}>
-            <Icons name="search" color="black" size={20} />
-          </Pressable>
+          <Icons name="search" color="black" size={20} />
 
         </View>
       </View>
@@ -147,60 +77,94 @@ const Index = () => {
             </View>          
         }       
 
-        {/* Tabs for "Things to Do" - Now Scrollable Horizontally */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContainer} // Ensure that tabs are arranged horizontally
-        >
+        {/* Tabs for "Things to Do" */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'activities' && styles.activeTab]}
             onPress={() => setActiveTab('activities')}
           >
-            <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>
-              Activities
-            </Text>
+            <Text style={[styles.tabText, activeTab === 'activities' && styles.activeTabText]}>Activities</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'places' && styles.activeTab]}
             onPress={() => setActiveTab('places')}
           >
-            <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>
-              Destinations
-            </Text>
+            <Text style={[styles.tabText, activeTab === 'places' && styles.activeTabText]}>Destinations</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'restaurants' && styles.activeTab]}
             onPress={() => setActiveTab('restaurants')}
           >
-            <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>
-              Restaurants
-            </Text>
+            <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>Restaurants</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'accommodations' && styles.activeTab]}
             onPress={() => setActiveTab('accommodations')}
           >
-            <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>
-              Accommodations
-            </Text>
+            <Text style={[styles.tabText, activeTab === 'accommodations' && styles.activeTabText]}>Accommodations</Text>
           </TouchableOpacity>
         </ScrollView>
 
         {/* Display Content Based on Active Tab */}
         <View style={styles.tabContent}>
           {activeTab === 'activities' && (
-            <Text style={styles.tabContentText}>Explore activities in this location.</Text>
+            <ScrollView>
+              {activities.map((activity) => (
+
+                <View key={activity.id} style={styles.activityCard}>
+                  {/* <Text style={styles.name}>{activity.name}</Text>
+                        <Text style={styles.description}>{activity.description}</Text> */}
+                  <Pressable onPress={() => handleActivityClick(activity.id)}>
+                    <Text style={styles.tabContentText}>Destination 1</Text>
+                  </Pressable>
+                </View>
+
+              ))}
+            </ScrollView>
           )}
+
           {activeTab === 'places' && (
-            <Text style={styles.tabContentText}>Check out places to go and explore.</Text>
-          )}
+              <ScrollView>
+              {places.map((place) => (
+                <View style={styles.activityCard}>
+              <Pressable onPress={() => handlePlaceClick(place.id)}>
+                    <Text style={styles.tabContentText}>{`${place.name}`} </Text>
+                  </Pressable>
+                </View>
+              ))}             
+              </ScrollView>
+            )}
+
           {activeTab === 'restaurants' && (
-            <Text style={styles.tabContentText}>Find the best restaurants around you.</Text>
+            <ScrollView>
+
+              {restaurants.map((activity) => (
+                <View style={styles.activityCard}>
+                  <Pressable onPress={() => handleRestaurantClick(accommodations.id)}>
+                    <Text style={styles.tabContentText}>Restaurant 1</Text>
+                  </Pressable>
+                </View>
+              ))}
+
+
+            </ScrollView>
           )}
+
           {activeTab === 'accommodations' && (
-            <Text style={styles.tabContentText}>Explore available accommodations nearby.</Text>
+            <ScrollView>
+              {accommodations.map((activity) => (
+                <View style={styles.activityCard}>
+                  <Pressable onPress={() => handleAccommodationClick(accommodations.id)}>
+                    <Text style={styles.tabContentText}>Accommodation 1</Text>
+                  </Pressable>
+                </View>
+
+                ))}
+        
+              
+              </ScrollView>
           )}
+          
         </View>
       </ScrollView>
     </View>
@@ -247,10 +211,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 0,
   },
-  icon: {
-    marginRight: 100,
-
-  },
   searchInput: {
     flex: 1,
     fontSize: 16,
@@ -288,7 +248,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 20, // Ensure spacing between tabs
+    marginRight: 20,
   },
   activeTab: {
     borderBottomWidth: 3,
@@ -312,4 +272,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-});
+  activityCard: {
+    backgroundColor: '#E8F9FF',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+})
