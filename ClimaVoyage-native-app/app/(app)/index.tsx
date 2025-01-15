@@ -169,10 +169,14 @@ const Index = () => {
       <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>
         <View style={styles.modalContainer}>
           {selectedForecast && (
-            <View>
+            <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{formatDate(selectedForecast.dt_txt)}</Text>
-              <Text style={styles.modalText}>Temperature: {selectedForecast.main.temp}°C</Text>
-              <Text style={styles.modalText}>Weather: {selectedForecast.weather[0].description}</Text>
+              <Text style={styles.modalTemperature}> {selectedForecast.main.temp}°C</Text>
+              <Text style={styles.modaldescription}>Weather: {selectedForecast.weather[0].description}</Text>
+              <Text style={styles.modalhumidity}>Humidity: {selectedForecast.main.humidity}%</Text>
+              <Text style={styles.modalwindSpeed}>Wind Speed: {selectedForecast.wind.speed} m/s  
+                </Text>
+
               <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
@@ -342,7 +346,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // changed to transparent background with 50% opacity
+  
   },
   modalTitle: {
     fontSize: 24,
@@ -354,6 +359,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#666',
   },
+
   closeButton: {
     marginTop: 20,
     backgroundColor: '#007bff',
@@ -424,5 +430,54 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-});
+  modalContent: {
+    
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+     // changed to transparent background with 50% opacity
+     borderRadius: 8,
+     padding: 20,
+
+  },
+  modalTemperature: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  modalDescription: {
+    fontSize: 16, 
+    marginBottom: 10,
+    },
+  modalButton: {
+    
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,  
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',  
+  },
+  modalhumidity: {
+    fontSize: 16,   
+    marginBottom: 10,
+  },
+  modalwindSpeed: {
+    fontSize: 16,
+    marginBottom: 10, 
+  },
+  modaldescription: {
+    fontSize: 16,
+    marginBottom: 10,   
+  },
+  modalclouds: {
+    fontSize: 16, 
+    marginBottom: 10,
+  },
+  }
+
+
+);
 
