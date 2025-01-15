@@ -133,10 +133,7 @@ const Index = () => {
           </Pressable>
 
         </View>
-      </View>
-
-      {/* Weather Info */}
-      <ScrollView style={styles.scrollContainer}>
+      </View>     
 
         {
           curLocationWeather && 
