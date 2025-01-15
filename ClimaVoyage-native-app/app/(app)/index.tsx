@@ -1,3 +1,17 @@
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image } from 'react-native';
+import { router, useRouter } from 'expo-router';
+import Icons from '@/utils/Icons'; // Assuming you have Icons component
+import { accommodations, activities, places, restaurants } from '@/utils/data';
+
+
+=======
+import Icons from '@/utils/Icons';
+
+>>>>>>> Stashed changes
 import React, { useEffect, useState } from 'react';
 import { Alert, ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
 import Icons from '@/utils/Icons'; 
@@ -32,6 +46,7 @@ const activities = [
   },
 ];
 
+<<<<<<< Updated upstream
 const accommodations = [
   {
     id: 1,
@@ -94,6 +109,9 @@ const places = [
     image: 'https://example.com/machu-picchu.jpg',
   },
 ];
+=======
+>>>>>>> 72b12d02bff98e517dc3fecac0effa5b6518f2de
+>>>>>>> Stashed changes
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities');
