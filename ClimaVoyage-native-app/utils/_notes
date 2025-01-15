@@ -37,7 +37,7 @@ const Index = () => {
   const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
   const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
   
-  const { weatherData, weatherLoading, error } = useWeather(query, useCoordinates);
+  const { weatherDa ta, weatherLoading, error } = useWeather(query, useCoordinates);
 
   useEffect(() => {
     if (currentLat && currentLon) 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ActivityIndicator, ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
-import { router, useRouter } from 'expo-router';
 import Icons from '@/utils/Icons'; 
+import { router, useRouter } from 'expo-router';
+
 
 import MapView, { Marker } from 'react-native-maps';
 
@@ -9,90 +10,8 @@ import useLocation from '@/hooks/useLocation';
 import useWeather from '@/hooks/useWeather';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import useForecast from '@/hooks/useForecast';
-
-const activities = [
-  {
-    id: 1,
-    name: 'Activity 1',
-    description: 'Fun outdoor adventure.',
-    image: 'https://example.com/activity1.jpg',
-  },
-  {
-    id: 2,
-    name: 'Activity 2',
-    description: 'Explore the mountains.',
-    image: 'https://example.com/activity2.jpg',
-  },
-  {
-    id: 3,
-    name: 'Activity 3',
-    description: 'Cultural city tour.',
-    image: 'https://example.com/activity3.jpg',
-  },
-];
-
-const accommodations = [
-  {
-    id: 1,
-    name: 'Grand Hotel',
-    description: 'A luxurious hotel in the heart of the city.',
-    image: 'https://example.com/grandhotel.jpg',
-  },
-  {
-    id: 2,
-    name: 'Mountain Resort',
-    description: 'A peaceful retreat surrounded by mountains.',
-    image: 'https://example.com/mountainresort.jpg',
-  },
-  {
-    id: 3,
-    name: 'Beachfront Villa',
-    description: 'A stunning villa located on the beach.',
-    image: 'https://example.com/beachfrontvilla.jpg',
-  },
-];
-
-const restaurants = [
-  {
-    id: 1,
-    name: 'Gourmet Bistro',
-    description: 'A fine dining restaurant offering a unique culinary experience.',
-    image: 'https://example.com/gourmetbistro.jpg',
-  },
-  {
-    id: 2,
-    name: 'Seafood Grill',
-    description: 'Specializing in fresh seafood with a view of the ocean.',
-    image: 'https://example.com/seafoodgrill.jpg',
-  },
-  {
-    id: 3,
-    name: 'Vegan Delight',
-    description: 'A plant-based restaurant with delicious vegan options.',
-    image: 'https://example.com/vegan.jpg',
-  },
-];
-
-const places = [
-  {
-    id: 1,
-    name: 'Eiffel Tower',
-    description: 'Iconic landmark in Paris, France.',
-    image: 'https://example.com/eiffel-tower.jpg',
-  },
-  {
-    id: 2,
-    name: 'Great Wall of China',
-    description: 'Ancient series of walls in China.',
-    image: 'https://example.com/great-wall.jpg',
-  },
-  {
-    id: 3,
-    name: 'Machu Picchu',
-    description: 'Ancient Inca city in the Andes Mountains.',
-    image: 'https://example.com/machu-picchu.jpg',
-  },
-];
+import Map from '../component/map';
+import { accommodations, activities, places, restaurants } from '@/utils/data';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities');
@@ -116,10 +35,10 @@ const Index = () => {
     loading: searchedLocationLoading } = useLocation(searchQuery);
 
   const [useCoordinates, setUseCoordinates] = useState<boolean>(false);
-  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);
-  
+  const [curLocationWeather, setCurLocationWeather] = useState<any>(null);  
   const { weatherData, weatherLoading } = useWeather(query, useCoordinates);
   const { hourly, daily, forecastsLoading } = useForecast(query, useCoordinates);
+  const [nearbyPlaces, setNearbyPlaces] = useState([]);
 
   const formatDate = (dt_txt) => {
     const date = new Date(dt_txt);
@@ -127,29 +46,56 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (currentLat && currentLon) {
+    if (currentLat && currentLon) 
+    {
       setQuery(`${currentLat},${currentLon}`);
       setUseCoordinates(true);
+      fetchNearbyPlaces(currentLat, currentLon); 
     }
   }, [currentLat, currentLon]);
 
   useEffect(() => {
-    if (weatherData && !searchQuery) {
+    if (searchedLat && searchedLon) {
+      fetchNearbyPlaces(searchedLat, searchedLon); // Fetch places based on searched location
+    }
+  }, [searchedLat, searchedLon]);
+
+  useEffect(() => {
+    if (weatherData && !searchQuery) 
+    {
       setCurLocationWeather(weatherData);
     }
   }, [weatherData]);
 
+
   const handleSearch = () => {   
-    if (searchQuery.trim()) {
+    if (searchQuery.trim()) 
+    {
       setQuery(searchQuery);
       setUseCoordinates(false);
-    } else if(searchedLat && searchedLon) {
+    } 
+    else if(searchedLat && searchedLon) 
+    {
       setQuery(`${searchedLat},${searchedLon}`);
       setUseCoordinates(true);
-    } else {
+    } 
+    else 
+    {
       setQuery(`${currentLat},${currentLon}`);
       setUseCoordinates(true);
     }
+  };
+
+  const fetchNearbyPlaces = async (lat, lon) => {
+    const radius = 1000; // 1 km radius
+    const overpassURL = `https://overpass-api.de/api/interpreter?data=[out:json];(node["amenity"](around:${radius},${lat},${lon}););out;`;
+    try 
+    {
+      const response = await fetch(overpassURL);
+      const data = await response.json();
+      setNearbyPlaces(data.elements); // Set the fetched places into state
+    } 
+    catch (error) { console.error('Error fetching nearby places:', error); }
   };
 
   const [selectedForecast, setSelectedForecast] = useState(null);
@@ -180,33 +126,18 @@ const Index = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.mapContainer}>
-        {(currentLat && currentLon) || (searchedLat && searchedLon) ? (
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: Number(currentLat || searchedLat),
-              longitude: Number(currentLon || searchedLon),
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          >
-            {currentLat && currentLon && curLocation && curLocationWeather && (
-              <Marker coordinate={{ 
-                latitude: Number(currentLat), 
-                longitude: Number(currentLon) }} 
-                title={`${curLocation.city} 🌡${curLocationWeather.main.temp}°C`} />
-            )}
-          </MapView>          
-        ) : (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>            
-            <ActivityIndicator size="large" color="#0000ff" style={{position:"absolute"}}/>
-            <Icons name="loc-dot" color="black" />
-            <Text style={styles.mapText}>Loading your location...</Text>
-          </View>          
-        )}
-      </View>
-
+      <Map 
+        currentLat={currentLat}
+        currentLon={currentLon}
+        searchedLat={searchedLat}
+        searchedLon={searchedLon}
+        curLocation={curLocation}
+        searchedLocation={searchedLocation}
+        curLocationWeather={curLocationWeather}
+        weatherData={weatherData}
+        nearbyPlaces={nearbyPlaces}
+      />
+      
       <View style={styles.searchContainer}>
         <View style={styles.inputWrapper}>
           <TextInput
@@ -295,11 +226,16 @@ const Index = () => {
 
         {activeTab === 'places' && (
           <ScrollView>
-            {places.map((place) => (
-              <View key={place.id} style={styles.activityCard}>
-                <Pressable onPress={() => handlePlaceClick(place.id)}>
-                  <Text style={styles.tabContentText}>{place.name}</Text>
-                  <Text style={styles.tabContentText}>{place.description}</Text>
+            {nearbyPlaces.map((place, index) => (
+              <View key={index} style={styles.activityCard}>
+                <Pressable onPress={() => handlePlaceClick(index)}>
+                  <Text style={styles.tabContentText}>
+                    {place.tags.name}
+                  </Text>
+
+                  <Text style={styles.tabContentText}>
+                    {place.tags['amenity'] || place.tags['tourism'] || place.tags['leisure']}
+                  </Text>
                 </Pressable>
               </View>
             ))}
@@ -383,7 +319,7 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenSans',
   },
   card: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#BCF2F6',
     padding: 16,
     marginRight: 12,
     borderRadius: 8,
@@ -433,8 +369,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 2,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    height:32
+    borderBottomColor: 'red',
+    height:32,
+    backgroundColor: '#F4F4F4',
+    width:"100%",
+    height:32,
+    
   },
   tab: {
     padding: 4,
@@ -443,8 +383,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   activeTab: {
+    alignSelf:"flex-start",
     borderBottomWidth: 3,
     borderBottomColor: '#333',
+    backgroundColor: '#edf2fb',
   },
   tabText: {
     fontSize: 16,
@@ -464,8 +406,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
+  activeCardContainer:{
+    height:"100%",
+    backgroundColor: '#F4F4F4',
+  },
   activityCard: {
-    backgroundColor: '#E8F9FF',
+    backgroundColor: 'white',
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
@@ -479,3 +425,4 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
+

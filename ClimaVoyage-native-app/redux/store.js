@@ -3,7 +3,7 @@ import shoppingReducer from './reducers';
 
 const store = configureStore({
     reducer: {
-        shopping: shoppingReducer,
+  
     },
 });
 
