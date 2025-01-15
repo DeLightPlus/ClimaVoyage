@@ -4,9 +4,7 @@ import axios from 'axios';
 const apiKey = "895284fb2d2c50a520ea537456963d9c"; 
 const baseUrl = 'http://api.openweathermap.org/data/2.5';
 
-const useForecast = (query, useCoordinates = false) => {
-
-    
+const useForecast = (query, useCoordinates = false) => {    
 
     const [forecastData , setForecastData] = useState(null)
     const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -90,6 +88,7 @@ const useForecast = (query, useCoordinates = false) => {
         }
     };
 
+    console.log(" city ", forecastData);
     console.log(" hourlyFC ", hourly);
     console.log(" dailyFC ", daily);
     

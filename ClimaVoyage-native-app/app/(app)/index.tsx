@@ -12,6 +12,7 @@ import useCurrentLocation from '@/hooks/useCurrentLocation';
 import useForecast from '@/hooks/useForecast';
 import Map from '../component/map';
 import { accommodations, activities, places, restaurants } from '@/utils/data';
+import { getSuggestedActivities } from '@/utils/getSuggestedActivities';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('activities');
@@ -39,6 +40,7 @@ const Index = () => {
   const { weatherData, weatherLoading } = useWeather(query, useCoordinates);
   const { hourly, daily, forecastsLoading } = useForecast(query, useCoordinates);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
+  const [suggestedActivities, setSuggestedActivities] = useState([]);
 
   const formatDate = (dt_txt) => {
     const date = new Date(dt_txt);
@@ -63,7 +65,22 @@ const Index = () => {
   useEffect(() => {
     if (weatherData && !searchQuery) 
     {
-      setCurLocationWeather(weatherData);
+      setCurLocationWeather(weatherData);      
+    }  
+
+    if (weatherData) 
+    {
+      const activities = getSuggestedActivities(weatherData);
+      setSuggestedActivities(activities);
+    }
+    
+  }, [weatherData]);
+
+  useEffect(() => {
+    if (weatherData) 
+    {
+      const activities = getSuggestedActivities(weatherData);
+      setSuggestedActivities(activities);
     }
   }, [weatherData]);
 
@@ -173,7 +190,7 @@ const Index = () => {
               <Text style={styles.modalTitle}>{formatDate(selectedForecast.dt_txt)}</Text>
               <Text style={styles.modalText}>Temperature: {selectedForecast.main.temp}°C</Text>
               <Text style={styles.modalText}>Weather: {selectedForecast.weather[0].description}</Text>
-              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+              <TouchableOpacity onPress={closeModal} style={styles.closeButton}>              
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -212,12 +229,12 @@ const Index = () => {
 
       <View style={styles.tabContent}>
         {activeTab === 'activities' && (
-          <ScrollView style={{height:250}}>
-            {activities.map((activity) => (
-              <View key={activity.id} style={styles.activityCard}>
-                <Pressable onPress={() => handleActivityClick(activity.id)}>
-                  <Text style={styles.tabContentText}>{activity.name}</Text>
-                  <Text style={styles.tabContentText}>{activity.description}</Text>
+          <ScrollView style={styles.activeCardContainer}>
+            {suggestedActivities.map((activity, index) => (
+              <View key={index} style={styles.activityCard}>
+                <Pressable onPress={() => handleActivityClick(index)}>
+                  <Text style={styles.tabContentText}>{activity}</Text>
+                  {/* <Text style={styles.tabContentText}>{activity.description}</Text> */}
                 </Pressable>
               </View>
             ))}
@@ -225,7 +242,7 @@ const Index = () => {
         )}
 
         {activeTab === 'places' && (
-          <ScrollView>
+          <ScrollView style={styles.activeCardContainer}>
             {nearbyPlaces.map((place, index) => (
               <View key={index} style={styles.activityCard}>
                 <Pressable onPress={() => handlePlaceClick(index)}>
@@ -243,7 +260,7 @@ const Index = () => {
         )}
 
         {activeTab === 'restaurants' && (
-          <ScrollView>
+          <ScrollView style={styles.activeCardContainer}>
             {restaurants.map((restaurant) => (
               <View key={restaurant.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleRestaurantClick(restaurant.id)}>
@@ -256,7 +273,7 @@ const Index = () => {
         )}
 
         {activeTab === 'accommodations' && (
-          <ScrollView>
+          <ScrollView style={styles.activeCardContainer}>
             {accommodations.map((accommodation) => (
               <View key={accommodation.id} style={styles.activityCard}>
                 <Pressable onPress={() => handleAccommodationClick(accommodation.id)}>
@@ -407,7 +424,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   activeCardContainer:{
-    height:"100%",
+    height:"35%",
     backgroundColor: '#F4F4F4',
   },
   activityCard: {

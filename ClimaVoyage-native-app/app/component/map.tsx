@@ -31,7 +31,7 @@ const Map = ({
     }
   }, [searchedLat, searchedLon]);
 
-  console.log(nearbyPlaces);
+//   console.log(nearbyPlaces);
   
 
   return (
