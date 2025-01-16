@@ -7,21 +7,14 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
+    "newArchEnabled": false,
+    "runtimeVersion": "1.0.1",  // You can set this to the version of your app or any custom version string
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "permissions": [
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
-      ],
-      "package": "com.matlakalakabelo1.ClimaVoyagenativeapp"
+      "runtimeVersion": "1.0.1",  // Match this version with the one in your AndroidManifest.xml
+      "package": "com.matlakalakabelo1.ClimaVoyagenativeapp",
+      "versionCode": 5
     },
+        
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -55,6 +48,11 @@
       "eas": {
         "projectId": "7708b881-ad43-4976-b817-05e66a379e03"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7708b881-ad43-4976-b817-05e66a379e03"
     }
+
+
   }
 }
