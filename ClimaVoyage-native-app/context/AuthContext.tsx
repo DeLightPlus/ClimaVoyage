@@ -1,12 +1,12 @@
 // /context/AuthContext.tsx
 import React, { createContext, useContext, useState, PropsWithChildren, useEffect } from 'react';
 
-import { auth } from '@/firebase/config';
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    updateProfile,
-    signOut } from 'firebase/auth';
+// import { auth } from '@/firebase/config';
+// import { 
+//     createUserWithEmailAndPassword, 
+//     signInWithEmailAndPassword, 
+//     updateProfile,
+//     signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the auth context type
@@ -57,10 +57,10 @@ export function SessionProvider({ children }: PropsWithChildren)
         setIsLoading(true);
         try 
         {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            await updateProfile(userCredential.user, { displayName: username }); // Save username in Firebase profile
-            setSession({ username, user: email, isGuest: false,  });
+            // await updateProfile(userCredential.user, { displayName: username }); // Save username in Firebase profile
+            // setSession({ username, user: email, isGuest: false,  });
         } 
         catch (error: any) 
         {
@@ -76,9 +76,9 @@ export function SessionProvider({ children }: PropsWithChildren)
         {
             if (email && password) 
             {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const username = userCredential.user.displayName || email.split("@")[0]; // Retrieve username or fallback to email prefix
-                setSession({ user: email, isGuest: false, username });
+                // const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                // const username = userCredential.user.displayName || email.split("@")[0]; // Retrieve username or fallback to email prefix
+                // setSession({ user: email, isGuest: false, username });
             } 
             else if(isGuest)
             {                
@@ -99,7 +99,7 @@ export function SessionProvider({ children }: PropsWithChildren)
         setIsLoading(true);
         try 
         {
-          await signOut(auth);
+        //   await signOut(auth);
           await AsyncStorage.removeItem("guest-session");
           setSession({ user: null, isGuest: false, username: null });
         } 

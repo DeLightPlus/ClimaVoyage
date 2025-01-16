@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Pressable, Image, Modal } from 'react-native';
-import Icons from '@/utils/Icons'; 
 import { useRouter } from 'expo-router';
+
+import Icons from '@/utils/Icons'; 
 
 import useLocation from '@/hooks/useLocation';
 import useWeather from '@/hooks/useWeather';
 import useCurrentLocation from '@/hooks/useCurrentLocation';
 import useForecast from '@/hooks/useForecast';
-
 import { accommodations, activities, places, restaurants } from '@/utils/data';
 import { getSuggestedActivities } from '@/utils/getSuggestedActivities';
 import MapScreen from '../component/MapLibreMap';

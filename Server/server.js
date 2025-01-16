@@ -1,9 +1,12 @@
 const express = require('express');
+
+const cors = require('cors')
 const app = express();
 const port = 3000;
 
 // Serve static files (if any)
 app.use(express.static('public'));
+app.use(cors())
 
 // Route to serve the map HTML dynamically
 app.get('/map', (req, res) => {

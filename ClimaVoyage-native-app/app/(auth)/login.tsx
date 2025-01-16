@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Pressable } from "react-native";
+import {ActivityIndicator, View, Text, TextInput, Button, StyleSheet, Pressable } from "react-native";
 import { useSession } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import Icons from "@/utils/Icons";

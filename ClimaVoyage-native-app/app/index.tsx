@@ -32,6 +32,7 @@ import Icons from "@/utils/Icons";
         <Icons name="logo" color="black" size={86}/>
       </View>
       <Text style={styles.title}>ClimateVoyage</Text>
+      
       <ActivityIndicator size="large" color="black" />
     </View>
   );
